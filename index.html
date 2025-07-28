@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Startup-Idea Evaluator</title>
+  <style>
+    body{font:16px/1.4 system-ui, sans-serif;max-width:640px;margin:40px auto}
+    textarea{width:100%;height:110px}
+    button{padding:.6em 1.2em;font-size:1em}
+    #status{margin-top:1em;color:#888}
+    #answer{white-space:pre-wrap;margin-top:1.5em;border-top:1px solid #ddd;padding-top:1em}
+  </style>
+</head>
+<body>
+  <h1>AI Startup-Idea Evaluator</h1>
+
+  <label>Your idea</label><br>
+  <textarea id="idea"></textarea><br>
+
+  <label>Your bio (optional)</label><br>
+  <textarea id="bio" style="height:70px"></textarea><br>
+
+  <button id="send">Evaluate</button>
+
+  <div id="status"></div>
+  <div id="answer"></div>
+
+<script>
+const SUBMIT_URL = 'https://<workspace>.n8n.cloud/webhook/submit';
+const RESULT_URL = 'https://<workspace>.n8n.cloud/webhook/result/';
+
+document.getElementById('send').onclick = async () => {
+  const idea = document.getElementById('idea').value.trim();
+  const bio  = document.getElementById('bio').value.trim();
+  if (!idea) return alert('Please type an idea first!');
+
+  // 1) send idea → get jobId back
+  document.getElementById('status').textContent = 'Submitting…';
+  const r1   = await fetch(SUBMIT_URL, {
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({ idea, bio })
+  });
+  const { jobId } = await r1.json();
+  if (!jobId) throw Error('submit failed');
+
+  // 2) poll /result/{jobId}
+  let done = false, tries = 0;
+  while (!done && tries < 120) {          // 10 min max
+    await new Promise(r => setTimeout(r, 3000));
+    const r2 = await fetch(RESULT_URL + jobId);
+    const json = await r2.json();
+
+    if (json.status === 'done') {
+      done = true;
+      document.getElementById('status').textContent = 'Completed ✔︎';
+      document.getElementById('answer').textContent = json.brief || JSON.stringify(json, null, 2);
+    } else if (json.status === 'working') {
+      document.getElementById('status').textContent = 'Working… ( ' + (++tries*3) + 's )';
+    } else {
+      document.getElementById('status').textContent = 'Unknown job ID 🤔';
+      break;
+    }
+  }
+};
+</script>
+</body>
+</html>

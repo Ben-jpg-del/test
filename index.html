@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <title>Startup-Idea Evaluator</title>
   <style>
-    body{font:16px/1.4 system-ui, sans-serif;max-width:640px;margin:40px auto}
+    body{font:16px/1.4 system-ui,sans-serif;max-width:640px;margin:40px auto}
     textarea{width:100%;height:110px}
     button{padding:.6em 1.2em;font-size:1em}
     #status{margin-top:1em;color:#888}
@@ -17,9 +17,6 @@
   <label>Your idea</label><br>
   <textarea id="idea"></textarea><br>
 
-  <label>Your bio (optional)</label><br>
-  <textarea id="bio" style="height:70px"></textarea><br>
-
   <button id="send">Evaluate</button>
 
   <div id="status"></div>
@@ -27,41 +24,44 @@
 
 <script>
 const SUBMIT_URL = 'https://benzh2322.app.n8n.cloud/webhook/6b09d0aa-a903-4239-a2bb-9cbff340c34a';
-const RESULT_URL = 'https://benzh2322.app.n8n.cloud/webhook/a6e524b5-b6f5-452a-a7bd-82771d08c8af/result/:jobId';
+const RESULT_URL = 'https://benzh2322.app.n8n.cloud/webhook/a6e524b5-b6f5-452a-a7bd-82771d08c8af/result/';
 
 document.getElementById('send').onclick = async () => {
   const idea = document.getElementById('idea').value.trim();
-  const bio  = document.getElementById('bio').value.trim();
   if (!idea) return alert('Please type an idea first!');
 
-  // 1) send idea → get jobId back
+  /* 1) Submit the idea */
   document.getElementById('status').textContent = 'Submitting…';
-  const r1   = await fetch(SUBMIT_URL, {
-    method:'POST',
-    headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({ idea, bio })
+  const r1 = await fetch(SUBMIT_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ idea })
   });
   const { jobId } = await r1.json();
-  if (!jobId) throw Error('submit failed');
+  if (!jobId) { document.getElementById('status').textContent = 'Submit failed'; return; }
 
-  // 2) poll /result/{jobId}
-  let done = false, tries = 0;
-  while (!done && tries < 120) {          // 10 min max
+  /* 2) Poll /result/{jobId} every 3 s */
+  let tries = 0;
+  while (tries < 120) {                         // 10 min max
     await new Promise(r => setTimeout(r, 3000));
-    const r2 = await fetch(RESULT_URL + jobId);
+    const r2   = await fetch(RESULT_URL + jobId);
     const json = await r2.json();
 
     if (json.status === 'done') {
-      done = true;
       document.getElementById('status').textContent = 'Completed ✔︎';
-      document.getElementById('answer').textContent = json.brief || JSON.stringify(json, null, 2);
-    } else if (json.status === 'working') {
-      document.getElementById('status').textContent = 'Working… ( ' + (++tries*3) + 's )';
+      document.getElementById('answer').textContent =
+        json.brief || JSON.stringify(json, null, 2);
+      return;
+    }
+    if (json.status === 'working') {
+      document.getElementById('status').textContent =
+        `Working… ( ${++tries * 3}s )`;
     } else {
       document.getElementById('status').textContent = 'Unknown job ID 🤔';
-      break;
+      return;
     }
   }
+  document.getElementById('status').textContent = 'Timed out ⏳';
 };
 </script>
 </body>

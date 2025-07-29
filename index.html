@@ -17,6 +17,9 @@
   <label>Your idea</label><br>
   <textarea id="idea"></textarea><br>
 
+  <label>Your bio (optional)</label><br>
+  <textarea id="bio" style="height:70px"></textarea><br>
+
   <button id="send">Evaluate</button>
 
   <div id="status"></div>
@@ -28,6 +31,7 @@ const RESULT_URL = 'https://benzh2322.app.n8n.cloud/webhook/a6e524b5-b6f5-452a-a
 
 document.getElementById('send').onclick = async () => {
   const idea = document.getElementById('idea').value.trim();
+  const bio  = document.getElementById('bio').value.trim();
   if (!idea) return alert('Please type an idea first!');
 
   // 1) send idea → get jobId back

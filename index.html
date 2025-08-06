@@ -2,26 +2,274 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Startup-Idea Evaluator</title>
 
   <style>
-    body        { font:16px/1.4 system-ui,sans-serif; max-width:640px; margin:40px auto; }
-    textarea    { width:100%; height:110px; }
-    button      { padding:.6em 1.2em; font-size:1em; }
-    #status     { margin-top:1em; color:#888; }
-    #answer     { white-space:pre-wrap; margin-top:1.5em; border-top:1px solid #ddd; padding-top:1em; }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #000000 0%, #04045E 50%, #023E89 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      color: #C0C0C0;
+    }
+
+    .container {
+      background: rgba(0, 0, 0, 0.8);
+      backdrop-filter: blur(10px);
+      border: 1px solid #3E84C6;
+      border-radius: 20px;
+      padding: 40px;
+      max-width: 600px;
+      width: 100%;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .container::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(62, 132, 198, 0.1), transparent);
+      animation: shimmer 3s infinite;
+    }
+
+    @keyframes shimmer {
+      0% { left: -100%; }
+      100% { left: 100%; }
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 30px;
+      font-size: 2.5em;
+      font-weight: 700;
+      background: linear-gradient(45deg, #C0C0C0, #3E84C6);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      text-shadow: 0 0 30px rgba(62, 132, 198, 0.5);
+      animation: glow 2s ease-in-out infinite alternate;
+    }
+
+    @keyframes glow {
+      from { text-shadow: 0 0 30px rgba(62, 132, 198, 0.5); }
+      to { text-shadow: 0 0 40px rgba(62, 132, 198, 0.8); }
+    }
+
+    label {
+      display: block;
+      margin-bottom: 10px;
+      font-size: 1.1em;
+      font-weight: 600;
+      color: #C0C0C0;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    textarea {
+      width: 100%;
+      height: 120px;
+      padding: 15px;
+      border: 2px solid #3E84C6;
+      border-radius: 10px;
+      background: rgba(0, 0, 0, 0.6);
+      color: #C0C0C0;
+      font-size: 16px;
+      font-family: inherit;
+      resize: vertical;
+      transition: all 0.3s ease;
+      margin-bottom: 20px;
+    }
+
+    textarea:focus {
+      outline: none;
+      border-color: #C0C0C0;
+      box-shadow: 0 0 20px rgba(192, 192, 192, 0.3);
+      transform: translateY(-2px);
+    }
+
+    textarea::placeholder {
+      color: rgba(192, 192, 192, 0.6);
+    }
+
+    button {
+      width: 100%;
+      padding: 15px 30px;
+      font-size: 1.1em;
+      font-weight: 600;
+      background: linear-gradient(45deg, #023E89, #3E84C6);
+      color: #C0C0C0;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    button::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+      transition: left 0.5s;
+    }
+
+    button:hover::before {
+      left: 100%;
+    }
+
+    button:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 25px rgba(62, 132, 198, 0.4);
+      background: linear-gradient(45deg, #3E84C6, #023E89);
+    }
+
+    button:active {
+      transform: translateY(-1px);
+    }
+
+    button:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    #status {
+      margin-top: 20px;
+      padding: 15px;
+      border-radius: 8px;
+      text-align: center;
+      font-weight: 500;
+      min-height: 20px;
+      transition: all 0.3s ease;
+    }
+
+    #status:not(:empty) {
+      background: rgba(62, 132, 198, 0.1);
+      border: 1px solid #3E84C6;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.7; }
+    }
+
+    #answer {
+      margin-top: 25px;
+      padding: 20px;
+      border-radius: 10px;
+      background: rgba(0, 0, 0, 0.4);
+      border: 1px solid #3E84C6;
+      white-space: pre-wrap;
+      line-height: 1.6;
+      max-height: 400px;
+      overflow-y: auto;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: all 0.5s ease;
+    }
+
+    #answer:not(:empty) {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* Scrollbar styling */
+    #answer::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    #answer::-webkit-scrollbar-track {
+      background: rgba(0, 0, 0, 0.3);
+      border-radius: 4px;
+    }
+
+    #answer::-webkit-scrollbar-thumb {
+      background: #3E84C6;
+      border-radius: 4px;
+    }
+
+    #answer::-webkit-scrollbar-thumb:hover {
+      background: #C0C0C0;
+    }
+
+    /* Responsive design */
+    @media (max-width: 768px) {
+      .container {
+        padding: 30px 20px;
+        margin: 10px;
+      }
+
+      h1 {
+        font-size: 2em;
+      }
+
+      textarea {
+        height: 100px;
+      }
+    }
+
+    /* Loading animation */
+    .loading {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border: 3px solid rgba(192, 192, 192, 0.3);
+      border-radius: 50%;
+      border-top-color: #3E84C6;
+      animation: spin 1s ease-in-out infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* Success animation */
+    .success {
+      color: #C0C0C0;
+      animation: successPulse 0.6s ease-in-out;
+    }
+
+    @keyframes successPulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.1); }
+      100% { transform: scale(1); }
+    }
   </style>
 </head>
 <body>
-  <h1>AI Startup-Idea Evaluator</h1>
+  <div class="container">
+    <h1>AI Startup-Idea Evaluator</h1>
 
-  <label>Your idea</label><br>
-  <textarea id="idea" placeholder="Describe your startup idea…"></textarea><br>
+    <label for="idea">Your Idea</label>
+    <textarea id="idea" placeholder="Describe your startup idea in detail..."></textarea>
 
-  <button id="send">Evaluate</button>
+    <button id="send">Evaluate Idea</button>
 
-  <div id="status"></div>
-  <div id="answer"></div>
+    <div id="status"></div>
+    <div id="answer"></div>
+  </div>
 
   <script>
     /* ——— endpoint URLs ——— */
@@ -33,46 +281,69 @@
       const idea = document.getElementById('idea').value.trim();
       if (!idea) return alert('Please type an idea first!');
 
-      /* 1)  submit the idea  */
-      document.getElementById('status').textContent = 'Submitting…';
-      const r1 = await fetch(SUBMIT_URL, {
-        method : 'POST',
-        headers: { 'Content-Type':'application/json' },
-        body   : JSON.stringify({ idea })
-      });
+      const button = document.getElementById('send');
+      const status = document.getElementById('status');
+      const answer = document.getElementById('answer');
 
-      const { jobId } = await r1.json();
-      if (!jobId) { alert('Submission failed ☹︎'); return; }
+      // Disable button and show loading state
+      button.disabled = true;
+      button.textContent = 'Evaluating...';
+      status.innerHTML = '<span class="loading"></span> Submitting your idea...';
+      answer.textContent = '';
 
-      /* small grace period to let n8n create the “working” stub */
-      await new Promise(res => setTimeout(res, 1500));
+      try {
+        /* 1)  submit the idea  */
+        const r1 = await fetch(SUBMIT_URL, {
+          method : 'POST',
+          headers: { 'Content-Type':'application/json' },
+          body   : JSON.stringify({ idea })
+        });
 
-      /* 2)  poll /result/:jobId  */
-      let done = false, tries = 0;
-      while (!done && tries < 60) {          // ~10 min max (200×3 s)
-        const r2   = await fetch(RESULT_URL + jobId);
-        const json = await r2.json();
-
-        if (json.status === 'done') {
-          done = true;
-          document.getElementById('status').textContent = 'Completed ✔︎';
-          document.getElementById('answer').textContent =
-            json.brief || JSON.stringify(json, null, 2);
-          break;
+        const { jobId } = await r1.json();
+        if (!jobId) { 
+          throw new Error('Submission failed ☹︎');
         }
 
-        /* treat both “working” and initial “unknown” the same */
-        document.getElementById('status').textContent =
-          'Working… ( ' + (++tries * 10) + ' s )';
+        /* small grace period to let n8n create the "working" stub */
+        await new Promise(res => setTimeout(res, 1500));
 
-        await new Promise(res => setTimeout(res, 10000));   // wait 3 s
-      }
+        /* 2)  poll /result/:jobId  */
+        let done = false, tries = 0;
+        while (!done && tries < 60) {          // ~10 min max (200×3 s)
+          const r2   = await fetch(RESULT_URL + jobId);
+          const json = await r2.json();
 
-      if (!done) {
-        document.getElementById('status').textContent =
-          'Timed out after 10 min ⏱';
+          if (json.status === 'done') {
+            done = true;
+            status.innerHTML = '<span class="success">✓</span> Evaluation completed!';
+            answer.textContent = json.brief || JSON.stringify(json, null, 2);
+            break;
+          }
+
+          /* treat both "working" and initial "unknown" the same */
+          status.innerHTML = `<span class="loading"></span> Analyzing your idea... (${++tries * 10}s)`;
+
+          await new Promise(res => setTimeout(res, 10000));   // wait 10 s
+        }
+
+        if (!done) {
+          status.textContent = 'Timed out after 10 minutes ⏱';
+        }
+      } catch (error) {
+        status.textContent = `Error: ${error.message}`;
+      } finally {
+        // Re-enable button
+        button.disabled = false;
+        button.textContent = 'Evaluate Idea';
       }
     };
+
+    // Add enter key support for textarea
+    document.getElementById('idea').addEventListener('keydown', function(e) {
+      if (e.key === 'Enter' && e.ctrlKey) {
+        document.getElementById('send').click();
+      }
+    });
   </script>
 </body>
 </html>

@@ -171,7 +171,7 @@
     /* ---------- fake progress helpers ---------- */
     const progressBar = document.getElementById('progressBar');
     let fakeProgress = 0;
-    const PROGRESS_STEPS = [8, 18, 32, 50, 75, 96]; // 4x(2-min) + first 2x(30s), then freeze
+    const PROGRESS_STEPS = [20, 40, 60, 80, 95, 99]; // bumped per-poll movement
     let progressStepIndex = 0;
 
     function setProgress(p){
@@ -195,7 +195,7 @@
         setProgress(PROGRESS_STEPS[applyingIndex]);
         progressStepIndex++;
       }
-      // After step 5 (index 5 -> 96%), we freeze until done.
+      // After step 5 (index 5 -> 99%), we freeze until done.
     }
 
     /* ---------- slot/symbol helpers (NEW) ---------- */

@@ -119,6 +119,8 @@
       background:rgba(0,0,0,.5);backdrop-filter:blur(6px);transition:.25s;
     }
     .metric:hover{transform:translateY(-4px)}
+    .metric .symbol{display:block;font-size:1.4em;line-height:1;margin-bottom:6px;filter:drop-shadow(0 0 6px rgba(62,132,198,.4));}
+    .metric .symbol.spin{animation:spin 0.8s linear infinite;} /* uses existing @keyframes spin */
     .metric .value{font-size:1.9em;font-weight:700;}
     .metric .label{font-size:.75em;letter-spacing:1px;text-transform:uppercase;
                    opacity:.75;margin-top:6px;display:block;}
@@ -196,21 +198,82 @@
       // After step 5 (index 5 -> 96%), we freeze until done.
     }
 
+    /* ---------- slot/symbol helpers (NEW) ---------- */
+    const SYMBOLS = {
+      Benchmark:             ['📈','🏁','💹','📊'],
+      Sentiment:             ['🧠','💬','🙂','🔍'],
+      Growth:                ['🌱','🚀','📈','🌿'],
+      CompetitiveIntensity:  ['🥊','⚔️','🏟️','🧩'],
+      CapitalIntensity:      ['🏗️','🧰','🏭','🔧'],
+      Overall:               ['⭐','🏆','🎯','✨']
+    };
+    const ORDER = ['Benchmark','Sentiment','Growth','CompetitiveIntensity','CapitalIntensity','Overall'];
+
+    function animateValue(node, end, ms=1000){
+      const start = 0;
+      const t0 = performance.now();
+      function step(t){
+        const p = Math.min(1, (t - t0) / ms);
+        const val = start + (end - start) * p;
+        node.textContent = val.toFixed(1);
+        if(p < 1) requestAnimationFrame(step);
+        else node.textContent = end.toFixed(1);
+      }
+      requestAnimationFrame(step);
+    }
+
     function renderScores(scores){
       const wrap = document.getElementById('scores');
       wrap.innerHTML = '';
       if(!scores) return;
 
-      Object.entries(scores).forEach(([label,val])=>{
+      const keys = ORDER.filter(k => Object.prototype.hasOwnProperty.call(scores,k))
+                        .concat(Object.keys(scores).filter(k => !ORDER.includes(k)));
+
+      keys.forEach((label)=>{
+        const val = Number(scores[label]);
         const tile = document.createElement('div');
         tile.className = 'metric';
         tile.style.color = hslForScore(val);
 
-        tile.innerHTML = `
-          <span class="value">${Number(val).toFixed(1)}</span>
-          <span class="label">${label}</span>
-          <div class="bar" style="width:${val}%"></div>`;
+        const symbol = document.createElement('span');
+        symbol.className = 'symbol spin';
+        const pool = SYMBOLS[label] || ['🎰','✨','🔄','🎲'];
+        symbol.textContent = pool[Math.floor(Math.random()*pool.length)];
+
+        const valueEl = document.createElement('span');
+        valueEl.className = 'value';
+        valueEl.textContent = '0.0';
+
+        const lbl = document.createElement('span');
+        lbl.className = 'label';
+        lbl.textContent = label;
+
+        const bar = document.createElement('div');
+        bar.className = 'bar';
+        bar.style.width = '0%';
+
+        tile.appendChild(symbol);
+        tile.appendChild(valueEl);
+        tile.appendChild(lbl);
+        tile.appendChild(bar);
         wrap.appendChild(tile);
+
+        // slot-like emoji shuffle, then settle on the metric's final symbol
+        const shuffleAll = [].concat(...Object.values(SYMBOLS));
+        const shuffle = setInterval(()=>{
+          symbol.textContent = shuffleAll[Math.floor(Math.random()*shuffleAll.length)];
+        }, 90);
+
+        setTimeout(()=>{
+          clearInterval(shuffle);
+          symbol.textContent = pool[0];
+          symbol.classList.remove('spin');
+        }, 1200);
+
+        // animate value count-up and bar fill
+        requestAnimationFrame(()=>{ bar.style.width = val + '%'; });
+        animateValue(valueEl, val, 1100);
       });
     }
 

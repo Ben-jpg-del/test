@@ -5,177 +5,201 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>ROO AI</title>
 
-  <!-- Google Fonts: JetBrains Mono -->
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
 
   <style>
-    *{margin:0;padding:0;box-sizing:border-box;}
+    *{margin:0;padding:0;box-sizing:border-box}
 
-    /* page shell */
     body{
       font-family:'JetBrains Mono',monospace;
       background:linear-gradient(135deg,#000 0%,#04045E 50%,#023E89 100%);
-      min-height:100vh;display:flex;align-items:center;justify-content:center;
-      padding:20px;color:#C0C0C0;
+      min-height:100vh;color:#C0C0C0;
     }
 
-    /* glass canvas */
-    .container{
-      background:rgba(0,0,0,.8);backdrop-filter:blur(10px);
-      border:1px solid #3E84C6;border-radius:20px;
-      padding:24px;max-width:960px;width:100%;
-      box-shadow:0 20px 40px rgba(0,0,0,.3);position:relative;overflow:hidden;
-      display:flex;flex-direction:column;min-height:70vh;
+    /* App shell (full screen on desktop) */
+    .app{
+      min-height:100vh;
+      display:flex;flex-direction:column;
+      max-width:1200px;margin:0 auto;padding:12px 16px;
     }
-    .container::before{
-      content:'';position:absolute;top:0;left:-100%;width:100%;height:100%;
-      background:linear-gradient(90deg,transparent,rgba(62,132,198,.08),transparent);
-      animation:shimmer 3s infinite;
-    }
-    @keyframes shimmer{0%{left:-100%;}100%{left:100%}}
 
-    h1{
-      text-align:center;margin-bottom:16px;font-size:2rem;font-weight:700;
-      background:linear-gradient(45deg,#C0C0C0,#3E84C6);
-      -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
-      text-shadow:0 0 30px rgba(62,132,198,.5);
-      animation:glow 2s ease-in-out infinite alternate;
+    /* Header with brand + thinking state */
+    .chat-header{
+      display:flex;align-items:center;justify-content:space-between;
+      gap:16px;padding:8px 4px 12px;
     }
-    @keyframes glow{from{text-shadow:0 0 30px rgba(62,132,198,.5);}
-                    to  {text-shadow:0 0 40px rgba(62,132,198,.8)} }
-
-    /* CHAT LAYOUT */
-    .chat{
-      display:flex;flex-direction:column;gap:14px;flex:1;min-height:0;
-    }
-    .messages{
-      flex:1;overflow:auto;padding:6px 4px 6px;display:flex;flex-direction:column;gap:12px;
-    }
-    .message{display:flex;gap:10px;align-items:flex-end;}
-    .message.user{justify-content:flex-end;}
-    .message.assistant{justify-content:flex-start;}
-
+    .brand{display:flex;align-items:center;gap:10px}
     .avatar{
-      width:28px;height:28px;border-radius:50%;
-      background:linear-gradient(45deg,#3E84C6,#023E89);flex:0 0 28px;
-      display:flex;align-items:center;justify-content:center;font-size:14px;color:#C0C0C0;
-      box-shadow:0 0 0 1px rgba(62,132,198,.5) inset;
+      width:36px;height:36px;border-radius:50%;
+      background:rgba(0,0,0,.35);border:1px solid #3E84C6;
+      display:grid;place-items:center;overflow:hidden;
+      box-shadow:0 8px 20px rgba(0,0,0,.25);
+    }
+    .avatar svg{width:100%;height:100%;display:block}
+    .title{
+      font-weight:700;font-size:1.15rem;letter-spacing:.5px;
+      background:linear-gradient(45deg,#C0C0C0,#3E84C6);
+      -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
+      text-shadow:0 0 20px rgba(62,132,198,.45);
     }
 
+    .thinking{
+      display:flex;align-items:center;gap:10px;min-height:28px;
+    }
+    .thinking .icon{filter:drop-shadow(0 0 6px rgba(62,132,198,.6))}
+    #status{
+      font-size:.95rem;min-width:140px;
+    }
+
+    /* Progress bar lives beside thinking text */
+    .progress{
+      width:180px;height:8px;border:1px solid #3E84C6;border-radius:6px;
+      background:rgba(62,132,198,.15);overflow:hidden;
+      box-shadow:inset 0 0 8px rgba(62,132,198,.25);
+    }
+    .progress-inner{
+      height:100%;width:0%;background:linear-gradient(90deg,#3E84C6,#7db6ea);
+      transition:width .6s ease;
+    }
+
+    /* Chat stream */
+    .chat{
+      flex:1;overflow:auto;border:1px solid rgba(62,132,198,.35);
+      border-radius:16px;background:rgba(0,0,0,.35);backdrop-filter:blur(8px);
+      padding:14px;display:flex;flex-direction:column;gap:12px;
+      box-shadow:0 12px 30px rgba(0,0,0,.25) inset;
+    }
+    .message{display:flex;gap:10px;align-items:flex-end;max-width:100%}
+    .message.user{justify-content:flex-end}
     .bubble{
-      max-width:720px;padding:14px 16px;border-radius:16px;border:1px solid #3E84C6;
-      background:rgba(0,0,0,.45);box-shadow:0 6px 16px rgba(0,0,0,.25);
+      padding:12px 14px;border-radius:14px;max-width:min(820px,100%);
+      line-height:1.55;border:1px solid #3E84C6;background:rgba(0,0,0,.5);
+      box-shadow:0 8px 20px rgba(0,0,0,.25);
+      white-space:pre-wrap;word-break:break-word;
     }
-    .user .bubble{
-      background:linear-gradient(135deg,rgba(2,62,137,.75),rgba(62,132,198,.55));
-      border-color:#7db6ea;
+    .message.user .bubble{
+      background:rgba(62,132,198,.12);border-color:#7db6ea;
     }
 
-    /* Composer (kept IDs, just styled like chat box) */
+    /* Composer row */
     .composer{
-      display:flex;gap:10px;margin-top:10px;align-items:flex-end;
-      border-top:1px solid rgba(62,132,198,.25);padding-top:10px;
+      display:flex;align-items:flex-end;gap:10px;margin-top:12px;
+      position:sticky;bottom:0;padding-top:10px;background:linear-gradient(180deg,transparent,rgba(0,0,0,.25));
     }
-    label{display:none;} /* hide label in chat mode */
+    .composer .avatar{flex:0 0 36px}
+    .composer-box{flex:1;display:flex;gap:8px;align-items:flex-end}
     textarea{
-      width:100%;height:80px;padding:12px;border:2px solid #3E84C6;border-radius:12px;
-      background:rgba(0,0,0,.6);color:#C0C0C0;font-size:15px;resize:vertical;transition:.3s;
+      flex:1;min-height:54px;max-height:180px;resize:vertical;
+      padding:12px;border:2px solid #3E84C6;border-radius:12px;
+      background:rgba(0,0,0,.6);color:#C0C0C0;font-size:15px;transition:.3s;
     }
-    textarea:focus{outline:none;border-color:#C0C0C0;box-shadow:0 0 20px rgba(192,192,192,.2);}
+    textarea:focus{outline:none;border-color:#C0C0C0;box-shadow:0 0 18px rgba(192,192,192,.25)}
+
     button{
-      padding:12px 18px;font-size:1em;font-weight:600;
-      background:linear-gradient(45deg,#023E89,#3E84C6);color:#C0C0C0;border:none;border-radius:10px;
-      cursor:pointer;transition:.3s;letter-spacing:.5px;
+      padding:12px 16px;font-size:1rem;font-weight:600;
+      background:linear-gradient(45deg,#023E89,#3E84C6);color:#C0C0C0;
+      border:none;border-radius:10px;cursor:pointer;transition:.25s;text-transform:uppercase;
     }
-    button:hover{
-      transform:translateY(-2px);box-shadow:0 10px 25px rgba(62,132,198,.35);
-      background:linear-gradient(45deg,#3E84C6,#023E89);
-    }
+    button:hover{transform:translateY(-2px);box-shadow:0 10px 22px rgba(62,132,198,.35)}
     button:disabled{opacity:.6;cursor:not-allowed;transform:none}
 
-    /* Status row now IN the assistant bubble + inline progress */
-    .status-row{display:flex;align-items:center;gap:12px;margin-bottom:10px;}
-    .status-icon{font-size:18px;filter:drop-shadow(0 0 6px rgba(62,132,198,.5));}
-    #status{
-      padding:0;border-radius:6px;text-align:left;min-height:auto;background:none;border:none;
-      animation:pulse 2s infinite;color:#C0C0C0;
-    }
-    @keyframes pulse{0%,100%{opacity:1}50%{opacity:.75}}
-
-    .progress{height:8px;border:1px solid #3E84C6;border-radius:6px;
-      background:rgba(62,132,198,.15);overflow:hidden;box-shadow:inset 0 0 8px rgba(62,132,198,.25);
-      width:180px; /* compact to sit inline with status */
-    }
-    .progress-inner{height:100%;width:0%;background:linear-gradient(90deg,#3E84C6,#7db6ea);transition:width .6s ease;}
-
-    /* Keep tiles & answer styles; just look like content inside assistant bubble */
-    .metrics{display:flex;flex-wrap:wrap;gap:12px;margin-top:8px;}
+    /* Metrics + brief inside a bot bubble */
+    .metrics{display:flex;flex-wrap:wrap;gap:14px;margin-top:6px}
     .metric{
-      flex:1 1 120px;position:relative;padding:14px 10px;border:2px solid currentColor;border-radius:12px;
-      text-align:center;background:rgba(0,0,0,.45);backdrop-filter:blur(6px);transition:.25s;
+      flex:1 1 130px;position:relative;padding:14px 10px 12px;
+      border:2px solid currentColor;border-radius:12px;text-align:center;
+      background:rgba(0,0,0,.45);backdrop-filter:blur(6px);transition:.25s;
     }
-    .metric:hover{transform:translateY(-4px)}
-    .metric .symbol{display:block;font-size:1.25em;line-height:1;margin-bottom:6px;filter:drop-shadow(0 0 6px rgba(62,132,198,.4));}
-    .metric .symbol.spin{animation:spin 0.8s linear infinite;}
-    .metric .value{font-size:1.6em;font-weight:700;}
-    .metric .label{font-size:.7em;letter-spacing:1px;text-transform:uppercase;opacity:.75;margin-top:6px;display:block;}
-    .metric .bar{position:absolute;left:0;bottom:0;height:4px;background:currentColor;border-radius:0 0 10px 10px;}
+    .metric .symbol{display:block;font-size:1.3em;line-height:1;margin-bottom:6px;filter:drop-shadow(0 0 6px rgba(62,132,198,.4))}
+    .metric .value{font-size:1.7em;font-weight:700}
+    .metric .label{font-size:.72rem;letter-spacing:1px;text-transform:uppercase;opacity:.75;margin-top:4px;display:block}
+    .metric .bar{position:absolute;left:0;bottom:0;height:3px;background:currentColor;border-radius:0 0 10px 10px}
+
+    #answer{margin-top:14px;padding:14px;border-radius:10px;background:rgba(0,0,0,.35);border:1px solid #3E84C6;max-height:420px;overflow:auto;opacity:1;transform:none}
+    #answer .md-h2{font-size:1.1em;font-weight:700;margin:10px 0 6px}
+    #answer p{margin:6px 0}
+    #answer::-webkit-scrollbar{width:8px}
+    #answer::-webkit-scrollbar-thumb{background:#3E84C6;border-radius:4px}
+    #answer::-webkit-scrollbar-thumb:hover{background:#C0C0C0}
+
+    .loading{display:inline-block;width:18px;height:18px;border:3px solid rgba(192,192,192,.3);border-radius:50%;border-top-color:#3E84C6;animation:spin 1s infinite linear}
     @keyframes spin{to{transform:rotate(360deg)}}
 
-    #answer{
-      margin-top:12px;padding:16px;border-radius:10px;background:rgba(0,0,0,.35);
-      border:1px solid #3E84C6;line-height:1.6;max-height:380px;overflow-y:auto;
-      opacity:0;transform:translateY(10px);transition:.4s;white-space:normal;
-    }
-    #answer:not(:empty){opacity:1;transform:translateY(0)}
-    #answer::-webkit-scrollbar{width:8px;}
-    #answer::-webkit-scrollbar-thumb{background:#3E84C6;border-radius:4px;}
-    #answer::-webkit-scrollbar-thumb:hover{background:#C0C0C0;}
-    #answer .md-h2{font-size:1.1em;font-weight:700;margin:12px 0 6px}
-    #answer p{margin:6px 0}
-
     @media(max-width:768px){
-      .container{padding:20px 16px;margin:10px}
-      h1{font-size:1.6rem}
-      textarea{height:90px}
+      .app{padding:8px}
       .progress{width:120px}
-    }
-
-    /* Desktop-only full-screen container (kept from prior change) */
-    @media(min-width:769px){
-      body{ padding:0; }
-      .container{ max-width:none;width:100%;min-height:100vh;border-radius:0; }
+      textarea{min-height:48px}
     }
   </style>
 </head>
 
 <body>
-  <div class="container">
-    <h1>ROO AI</h1>
-
-    <div class="chat">
-      <div id="messages" class="messages">
-        <!-- Messages will be appended here -->
-        <div class="message assistant">
-          <div class="avatar">🤖</div>
-          <div class="bubble">
-            <div class="status-row">
-              <span class="status-icon">⚙️</span>
-              <div id="status"></div>
-              <div class="progress" aria-label="Progress"><!-- moved inline -->
-                <div id="progressBar" class="progress-inner"></div>
-              </div>
-            </div>
-
-            <div id="scores" class="metrics"></div>
-            <div id="answer"></div>
-          </div>
+  <div class="app">
+    <!-- Header -->
+    <div class="chat-header">
+      <div class="brand">
+        <div class="avatar" title="ROO — Risk · Odds · Opportunity" aria-label="ROO AI">
+          <!-- ROO SVG -->
+          <svg viewBox="0 0 64 64" role="img" aria-hidden="true">
+            <defs>
+              <linearGradient id="rooGrad" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%"  stop-color="#3E84C6"/>
+                <stop offset="100%" stop-color="#023E89"/>
+              </linearGradient>
+            </defs>
+            <circle cx="32" cy="32" r="30" fill="rgba(0,0,0,.30)" stroke="url(#rooGrad)" stroke-width="2"/>
+            <text x="12" y="39" font-family="JetBrains Mono, monospace" font-weight="700" font-size="28" fill="url(#rooGrad)">R</text>
+            <circle cx="41.5" cy="24" r="7" fill="none" stroke="#7DB6EA" stroke-width="3"/>
+            <circle cx="48.5" cy="33" r="7" fill="none" stroke="url(#rooGrad)" stroke-width="3" opacity="0.95"/>
+            <path d="M38 42 L52 28" stroke="#7DB6EA" stroke-width="2.5" stroke-linecap="round"/>
+            <polyline points="49,27 52,27 52,30" fill="none" stroke="#7DB6EA" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
         </div>
+        <div class="title">ROO AI</div>
       </div>
 
-      <!-- Composer -->
-      <div class="composer">
-        <label for="idea">Your Idea</label>
+      <div class="thinking" aria-live="polite">
+        <span class="icon">💡</span>
+        <span id="status"></span>
+        <div class="progress" aria-label="Progress">
+          <div id="progressBar" class="progress-inner"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Chat stream -->
+    <div id="chat" class="chat" role="log" aria-live="polite">
+      <!-- User’s prompt bubble appears after submit -->
+      <!-- Results bubble (scores + brief) -->
+      <div id="resultBubble" class="message bot" style="display:none">
+        <div class="bubble" style="width:100%">
+          <div id="scores" class="metrics"></div>
+          <div id="answer"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Composer -->
+    <div class="composer">
+      <div class="avatar" title="ROO — Risk · Odds · Opportunity" aria-hidden="true">
+        <!-- ROO SVG (same as header) -->
+        <svg viewBox="0 0 64 64" role="img" aria-hidden="true">
+          <defs>
+            <linearGradient id="rooGrad2" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%"  stop-color="#3E84C6"/>
+              <stop offset="100%" stop-color="#023E89"/>
+            </linearGradient>
+          </defs>
+          <circle cx="32" cy="32" r="30" fill="rgba(0,0,0,.30)" stroke="url(#rooGrad2)" stroke-width="2"/>
+          <text x="12" y="39" font-family="JetBrains Mono, monospace" font-weight="700" font-size="28" fill="url(#rooGrad2)">R</text>
+          <circle cx="41.5" cy="24" r="7" fill="none" stroke="#7DB6EA" stroke-width="3"/>
+          <circle cx="48.5" cy="33" r="7" fill="none" stroke="url(#rooGrad2)" stroke-width="3" opacity="0.95"/>
+          <path d="M38 42 L52 28" stroke="#7DB6EA" stroke-width="2.5" stroke-linecap="round"/>
+          <polyline points="49,27 52,27 52,30" fill="none" stroke="#7DB6EA" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+
+      <div class="composer-box">
         <textarea id="idea" placeholder="Describe your startup idea in detail..."></textarea>
         <button id="send">Evaluate Idea</button>
       </div>
@@ -188,7 +212,7 @@
 
     const hslForScore = s => `hsl(${Math.max(0, Math.min(120, s))}, 70%, 50%)`;
 
-    // ---------- fake progress helpers ----------
+    // Progress helpers (unchanged logic, IDs preserved)
     const progressBar = document.getElementById('progressBar');
     let fakeProgress = 0;
     const PROGRESS_STEPS = [20, 40, 60, 80, 95, 99];
@@ -199,24 +223,16 @@
       progressBar.style.width = fakeProgress + '%';
     }
     function resetProgress(){
-      fakeProgress = 0;
-      progressStepIndex = 0;
-      setProgress(0);
+      fakeProgress = 0; progressStepIndex = 0; setProgress(0);
     }
     function tickProgressForInterval(intervalMs){
       const isTwoMinPhase = intervalMs >= 120000;
-      const applyingIndex = progressStepIndex;
-
-      if (applyingIndex < 4 && isTwoMinPhase){
-        setProgress(PROGRESS_STEPS[applyingIndex]);
-        progressStepIndex++;
-      } else if (applyingIndex >= 4 && applyingIndex < 6 && intervalMs === 30000){
-        setProgress(PROGRESS_STEPS[applyingIndex]);
-        progressStepIndex++;
-      }
+      const i = progressStepIndex;
+      if (i < 4 && isTwoMinPhase){ setProgress(PROGRESS_STEPS[i]); progressStepIndex++; }
+      else if (i >= 4 && i < 6 && intervalMs === 30000){ setProgress(PROGRESS_STEPS[i]); progressStepIndex++; }
     }
 
-    // ---------- slot/symbol helpers ----------
+    // Score tiles (unchanged)
     const SYMBOLS = {
       Benchmark:['📈','🏁','💹','📊'],
       Sentiment:['🧠','💬','🙂','🔍'],
@@ -228,8 +244,7 @@
     const ORDER = ['Benchmark','Sentiment','Growth','CompetitiveIntensity','CapitalIntensity','Overall'];
 
     function animateValue(node, end, ms=1000){
-      const start = 0;
-      const t0 = performance.now();
+      const start = 0, t0 = performance.now();
       function step(t){
         const p = Math.min(1, (t - t0) / ms);
         const val = start + (end - start) * p;
@@ -255,9 +270,9 @@
         tile.style.color = hslForScore(val);
 
         const symbol = document.createElement('span');
-        symbol.className = 'symbol spin';
+        symbol.className = 'symbol';
         const pool = SYMBOLS[label] || ['🎰','✨','🔄','🎲'];
-        symbol.textContent = pool[Math.floor(Math.random()*pool.length)];
+        symbol.textContent = pool[0];
 
         const valueEl = document.createElement('span');
         valueEl.className = 'value';
@@ -277,17 +292,6 @@
         tile.appendChild(bar);
         wrap.appendChild(tile);
 
-        const shuffleAll = [].concat(...Object.values(SYMBOLS));
-        const shuffle = setInterval(()=>{
-          symbol.textContent = shuffleAll[Math.floor(Math.random()*shuffleAll.length)];
-        }, 90);
-
-        setTimeout(()=>{
-          clearInterval(shuffle);
-          symbol.textContent = pool[0];
-          symbol.classList.remove('spin');
-        }, 1200);
-
         requestAnimationFrame(()=>{ bar.style.width = val + '%'; });
         animateValue(valueEl, val, 1100);
       });
@@ -295,18 +299,16 @@
 
     function extractBrief(text){
       const marker = '## Snapshot';
-      const idx    = text.indexOf(marker);
+      const idx = text.indexOf(marker);
       return idx === -1 ? text : text.slice(idx).trimStart();
     }
 
     function escapeHTML(s){
-      return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
-              .replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+      return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
     }
-
     function formatBriefToHTML(text){
       const lines = text.split(/\r?\n/);
-      const html = lines.map(line=>{
+      return lines.map(line=>{
         if(/^##\s+/.test(line)){
           const title = escapeHTML(line.replace(/^##\s+/, '').trim());
           return `<div class="md-h2">${title}</div>`;
@@ -314,38 +316,34 @@
         if(line.trim()==='') return '';
         return `<p>${escapeHTML(line)}</p>`;
       }).join('');
-      return html;
     }
 
-    // Append a user bubble on submit (display only)
-    function addUserMessage(text){
-      const messages = document.getElementById('messages');
-      const msg = document.createElement('div');
-      msg.className = 'message user';
-      msg.innerHTML = `
-        <div class="bubble">${escapeHTML(text)}</div>
-        <div class="avatar">🧑</div>
-      `;
-      messages.appendChild(msg);
-      messages.scrollTop = messages.scrollHeight;
+    // Chat helpers (display-only)
+    const chat = document.getElementById('chat');
+    function addUserBubble(text){
+      const row = document.createElement('div');
+      row.className = 'message user';
+      row.innerHTML = `<div class="bubble">${escapeHTML(text)}</div>`;
+      chat.appendChild(row);
+      chat.scrollTop = chat.scrollHeight;
     }
+    function showResultBubble(){ document.getElementById('resultBubble').style.display = 'flex'; chat.scrollTop = chat.scrollHeight; }
 
     document.getElementById('send').onclick = async () => {
       const idea = document.getElementById('idea').value.trim();
       if(!idea) return alert('Please type an idea first!');
 
-      addUserMessage(idea);
-
-      const btn    = document.getElementById('send');
+      const btn = document.getElementById('send');
       const status = document.getElementById('status');
       const answer = document.getElementById('answer');
       const scores = document.getElementById('scores');
 
+      addUserBubble(idea);
       scores.innerHTML = '';
       answer.textContent = '';
       resetProgress();
-      status.textContent  = 'Submitting your idea...';
-      btn.disabled = true; btn.textContent = 'Evaluating...';
+      status.innerHTML  = '<span class="loading" aria-hidden="true"></span> Submitting…';
+      btn.disabled = true; btn.textContent = 'Evaluating…';
 
       try{
         const r1 = await fetch(SUBMIT_URL,{
@@ -354,7 +352,7 @@
           body:JSON.stringify({ idea })
         });
         const { jobId } = await r1.json();
-        if(!jobId) throw new Error('Submission failed ☹︎');
+        if(!jobId) throw new Error('Submission failed');
 
         await new Promise(res=>setTimeout(res,1500));
 
@@ -371,22 +369,19 @@
 
             if(data.status === 'done'){
               done = true;
-              status.textContent = 'Evaluation completed!';
+              status.textContent = 'Completed';
               setProgress(100);
               renderScores(data.scores);
               const brief = extractBrief(data.brief || '');
               answer.innerHTML = formatBriefToHTML(brief);
-
-              // scroll to latest content
-              const messages = document.getElementById('messages');
-              messages.scrollTop = messages.scrollHeight;
+              showResultBubble();
               break;
             }
           }
 
           const elapsed = Date.now() - pollStart;
           const intervalMs = elapsed < 8 * 60 * 1000 ? 120000 : 30000;
-          status.textContent = 'Working...';
+          status.innerHTML = '<span class="loading" aria-hidden="true"></span> Thinking…';
 
           await new Promise(res=>setTimeout(res, intervalMs));
           tickProgressForInterval(intervalMs);
@@ -394,7 +389,7 @@
           tries++;
         }
 
-        if(!done) document.getElementById('status').textContent = 'Timed out after ~36 minutes ⏱';
+        if(!done) document.getElementById('status').textContent = 'Timed out';
 
       }catch(err){
         document.getElementById('status').textContent = `Error: ${err.message}`;

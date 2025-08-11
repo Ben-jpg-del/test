@@ -5,218 +5,223 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>ROO AI</title>
 
-  <!-- Google Fonts: JetBrains Mono -->
+  <!-- JetBrains Mono -->
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
 
-  <!-- ─────────────  STYLES  ───────────── -->
   <style>
-    *{margin:0;padding:0;box-sizing:border-box;}
+    :root{
+      --bg:#0b0f1a;
+      --panel:#0f1524;
+      --muted:#9aa4b2;
+      --text:#e6e9ef;
+      --accent:#3E84C6;
+      --accent-2:#6aa6da;
+      --border:#1d2638;
+      --good:#16a34a;
+      --mid:#f59e0b;
+      --bad:#ef4444;
+    }
 
-    /* page shell */
+    *{margin:0;padding:0;box-sizing:border-box}
+
     body{
       font-family:'JetBrains Mono',monospace;
-      background:linear-gradient(135deg,#000 0%,#04045E 50%,#023E89 100%);
-      min-height:100vh;display:flex;align-items:center;justify-content:center;
-      padding:20px;color:#C0C0C0;
+      background:
+        radial-gradient(1200px 800px at 10% -10%, #12203a 0%, transparent 60%),
+        radial-gradient(1200px 800px at 110% 110%, #0e1a2b 0%, transparent 60%),
+        var(--bg);
+      color:var(--text);
+      min-height:100vh;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:32px;
     }
 
-    /* glass card */
     .container{
-      background:rgba(0,0,0,.8);backdrop-filter:blur(10px);
-      border:1px solid #3E84C6;border-radius:20px;
-      padding:40px;max-width:600px;width:100%;
-      box-shadow:0 20px 40px rgba(0,0,0,.3);position:relative;overflow:hidden;
+      width:100%;
+      max-width:780px;
+      background:var(--panel);
+      border:1px solid var(--border);
+      border-radius:14px;
+      padding:28px;
+      box-shadow:0 8px 40px rgba(0,0,0,.35), inset 0 0 0 1px rgba(255,255,255,.02);
     }
-    .container::before{
-      content:'';position:absolute;top:0;left:-100%;width:100%;height:100%;
-      background:linear-gradient(90deg,transparent,rgba(62,132,198,.1),transparent);
-      animation:shimmer 3s infinite;
-    }
-    @keyframes shimmer{0%{left:-100%;}100%{left:100%}}
 
-    /* title */
-    h1{
-      text-align:center;margin-bottom:30px;font-size:2.5em;font-weight:700;
-      background:linear-gradient(45deg,#C0C0C0,#3E84C6);
-      -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
-      text-shadow:0 0 30px rgba(62,132,198,.5);
-      animation:glow 2s ease-in-out infinite alternate;
+    header{
+      display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;
     }
-    @keyframes glow{from{text-shadow:0 0 30px rgba(62,132,198,.5);}
-                    to  {text-shadow:0 0 40px rgba(62,132,198,.8)} }
+    .brand{
+      display:flex;align-items:center;gap:12px;
+      letter-spacing:.5px;
+    }
+    .logo{
+      width:26px;height:26px;border-radius:6px;
+      background:linear-gradient(135deg,var(--accent),var(--accent-2));
+      box-shadow:0 0 0 1px rgba(62,132,198,.35), 0 6px 18px rgba(62,132,198,.25);
+    }
+    h1{font-size:18px;font-weight:700}
+    .sub{font-size:12px;color:var(--muted)}
 
-    /* form */
-    label{display:block;margin-bottom:10px;font-size:1.1em;font-weight:600;
-          text-transform:uppercase;letter-spacing:1px;}
+    label{
+      display:block;margin:8px 0 8px 0;font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;
+    }
     textarea{
-      width:100%;height:120px;padding:15px;
-      border:2px solid #3E84C6;border-radius:10px;
-      background:rgba(0,0,0,.6);color:#C0C0C0;font-size:15px;resize:vertical;
-      margin-bottom:20px;transition:.3s;
+      width:100%;min-height:120px;resize:vertical;
+      background:#0b1020;border:1px solid var(--border);border-radius:10px;
+      color:var(--text);padding:14px;font-size:14px;line-height:1.5;
+      transition:border-color .2s, box-shadow .2s;
     }
-    textarea:focus{
-      outline:none;border-color:#C0C0C0;
-      box-shadow:0 0 20px rgba(192,192,192,.3);transform:translateY(-2px);
-    }
+    textarea:focus{outline:none;border-color:#2b3c5a;box-shadow:0 0 0 3px rgba(62,132,198,.15)}
+
+    .row{display:flex;gap:12px;margin-top:12px}
     button{
-      width:100%;padding:15px 30px;font-size:1.1em;font-weight:600;
-      background:linear-gradient(45deg,#023E89,#3E84C6);color:#C0C0C0;
-      border:none;border-radius:10px;cursor:pointer;transition:.3s;
-      text-transform:uppercase;letter-spacing:1px;position:relative;overflow:hidden;
+      appearance:none;border:0;border-radius:10px;cursor:pointer;
+      padding:12px 16px;font-size:14px;font-weight:600;
+      background:linear-gradient(135deg,var(--accent),var(--accent-2));
+      color:#0b0f1a;flex:0 0 160px;
+      box-shadow:0 6px 18px rgba(62,132,198,.25);
+      transition:transform .15s ease, filter .2s ease;
     }
-    button::before{
-      content:'';position:absolute;top:0;left:-100%;width:100%;height:100%;
-      background:linear-gradient(90deg,transparent,rgba(255,255,255,.2),transparent);
-      transition:left .5s;
-    }
-    button:hover::before{left:100%}
-    button:hover{
-      transform:translateY(-3px);box-shadow:0 10px 25px rgba(62,132,198,.4);
-      background:linear-gradient(45deg,#3E84C6,#023E89);
-    }
-    button:disabled{opacity:.6;cursor:not-allowed;transform:none}
+    button:hover{transform:translateY(-1px)}
+    button:disabled{filter:grayscale(.4) brightness(.9);cursor:not-allowed}
 
-    /* status + answer */
-    #status{margin-top:20px;padding:15px;border-radius:8px;text-align:center;
-            min-height:20px;transition:.3s}
-    #status:not(:empty){
-      background:rgba(62,132,198,.1);border:1px solid #3E84C6;
-      animation:pulse 2s infinite;
+    #status{
+      flex:1;border:1px dashed var(--border);border-radius:10px;
+      padding:12px 14px;font-size:13px;color:var(--muted);
+      display:flex;align-items:center;gap:10px;min-height:44px;
     }
-    @keyframes pulse{0%,100%{opacity:1}50%{opacity:.7}}
-
-    /* FAKE progress bar (separate from #status so it doesn't get wiped) */
-    .progress{
-      height:8px;border:1px solid #3E84C6;border-radius:6px;
-      background:rgba(62,132,198,.15);overflow:hidden;margin-top:10px;
-      box-shadow:inset 0 0 8px rgba(62,132,198,.25);
+    .spinner{
+      width:16px;height:16px;border:2px solid rgba(255,255,255,.15);
+      border-top-color:var(--accent);border-radius:50%;animation:spin 1s linear infinite;
     }
-    .progress-inner{
-      height:100%;width:0%;
-      background:linear-gradient(90deg,#3E84C6,#7db6ea);
-      transition:width .6s ease;
-    }
-
-    #answer{
-      margin-top:25px;padding:20px;border-radius:10px;
-      background:rgba(0,0,0,.4);border:1px solid #3E84C6;
-      line-height:1.6;max-height:400px;overflow-y:auto;
-      opacity:0;transform:translateY(20px);transition:.5s;
-      white-space:normal;
-    }
-    #answer:not(:empty){opacity:1;transform:translateY(0)}
-    #answer::-webkit-scrollbar{width:8px;}
-    #answer::-webkit-scrollbar-thumb{background:#3E84C6;border-radius:4px;}
-    #answer::-webkit-scrollbar-thumb:hover{background:#C0C0C0;}
-    #answer .md-h2{font-size:1.25em;font-weight:700;margin:14px 0 6px}
-    #answer p{margin:6px 0}
-
-    /* metric tiles */
-    .metrics{display:flex;flex-wrap:wrap;gap:20px;margin-top:25px;}
-    .metric{
-      flex:1 1 120px;position:relative;padding:18px 12px 14px;
-      border:2px solid currentColor;border-radius:12px;text-align:center;
-      background:rgba(0,0,0,.5);backdrop-filter:blur(6px);transition:.25s;
-    }
-    .metric:hover{transform:translateY(-4px)}
-    .metric .symbol{display:block;font-size:1.4em;line-height:1;margin-bottom:6px;filter:drop-shadow(0 0 6px rgba(62,132,198,.4));}
-    .metric .symbol.spin{animation:spin 0.8s linear infinite;} /* uses existing @keyframes spin */
-    .metric .value{font-size:1.9em;font-weight:700;}
-    .metric .label{font-size:.75em;letter-spacing:1px;text-transform:uppercase;
-                   opacity:.75;margin-top:6px;display:block;}
-    .metric .bar{position:absolute;left:0;bottom:0;height:4px;background:currentColor;
-                 border-radius:0 0 10px 10px;}
-
-    /* loader & success tick */
-    .loading{display:inline-block;width:20px;height:20px;border:3px solid rgba(192,192,192,.3);
-             border-radius:50%;border-top-color:#3E84C6;animation:spin 1s infinite ease-in-out;}
     @keyframes spin{to{transform:rotate(360deg)}}
-    .success{animation:successPulse .6s;}
-    @keyframes successPulse{0%{transform:scale(1)}50%{transform:scale(1.1)}100%{transform:scale(1)}}
 
-    @media(max-width:768px){
-      .container{padding:30px 20px;margin:10px}
-      h1{font-size:2em}
-      textarea{height:100px}
+    .progress{height:8px;border-radius:6px;background:#0b1020;border:1px solid var(--border);margin-top:10px;overflow:hidden}
+    .progress-inner{height:100%;width:0%;background:linear-gradient(90deg,var(--accent),var(--accent-2));transition:width .6s ease}
+
+    /* metrics grid */
+    .metrics{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:18px}
+    @media (max-width:720px){.metrics{grid-template-columns:1fr}}
+
+    .metric{
+      border:1px solid var(--border);border-radius:12px;background:#0b1020;
+      padding:14px 14px 12px;display:grid;grid-template-columns:1fr auto;gap:8px 12px;
     }
+    .metric .label{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em}
+    .metric .value{font-size:22px;font-weight:700;line-height:1}
+    .metric .chip{
+      justify-self:start;grid-column:1/2;
+      font-size:11px;color:#cdd6e3;background:#10182b;border:1px solid var(--border);
+      padding:4px 8px;border-radius:999px
+    }
+    .meter{
+      grid-column:1 / -1;height:6px;border-radius:5px;background:#0a1326;border:1px solid var(--border);overflow:hidden
+    }
+    .meter > i{display:block;height:100%;width:0%;}
+    .meter.good > i{background:linear-gradient(90deg,#0ea75a,#61d497)}
+    .meter.mid > i {background:linear-gradient(90deg,#f59e0b,#ffd166)}
+    .meter.bad > i {background:linear-gradient(90deg,#ef4444,#fb7185)}
+
+    /* brief panel */
+    #answer{
+      margin-top:18px;border:1px solid var(--border);border-radius:12px;background:#0b1020;padding:18px;
+      max-height:420px;overflow:auto
+    }
+    #answer .md-h2{font-size:14px;font-weight:700;margin:12px 0 6px;color:#cfd6e6}
+    #answer p{margin:6px 0;font-size:13px;color:#d8dee9}
+    #answer::-webkit-scrollbar{width:10px}
+    #answer::-webkit-scrollbar-thumb{background:#16203a;border-radius:8px}
+
+    .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
   </style>
 </head>
-
 <body>
   <div class="container">
-    <h1>ROO AI</h1>
+    <header>
+      <div class="brand">
+        <div class="logo" aria-hidden="true"></div>
+        <div>
+          <h1>ROO AI</h1>
+          <div class="sub">Idea Evaluation</div>
+        </div>
+      </div>
+      <div class="sub">v1.2</div>
+    </header>
 
     <label for="idea">Your Idea</label>
     <textarea id="idea" placeholder="Describe your startup idea in detail..."></textarea>
 
-    <button id="send">Evaluate Idea</button>
+    <div class="row">
+      <button id="send">Evaluate Idea</button>
+      <div id="status"><span class="sr-only">Status:</span><span>Idle</span></div>
+    </div>
 
-    <div id="status"></div>
-    <!-- Fake progress bar lives outside of #status so status text replacements don't remove it -->
     <div class="progress" aria-label="Progress">
       <div id="progressBar" class="progress-inner"></div>
     </div>
 
-    <div id="scores" class="metrics"></div>
-    <div id="answer"></div>
+    <section id="scores" class="metrics" aria-label="Scores"></section>
+    <section id="answer" aria-label="Brief"></section>
   </div>
 
-  <!-- ─────────────  SCRIPT  ───────────── -->
   <script>
     const SUBMIT_URL = 'https://benzh88.app.n8n.cloud/webhook/6b09d0aa-a903-4239-a2bb-9cbff340c34a';
     const RESULT_URL = 'https://benzh88.app.n8n.cloud/webhook/a6e524b5-b6f5-452a-a7bd-82771d08c8af/result/';
 
+    // color mapping stays continuous while tiles use qualitative bands
     const hslForScore = s => `hsl(${Math.max(0, Math.min(120, s))}, 70%, 50%)`;
 
-    /* ---------- fake progress helpers ---------- */
+    // ---- progress handling ----
     const progressBar = document.getElementById('progressBar');
     let fakeProgress = 0;
-    const PROGRESS_STEPS = [20, 40, 60, 80, 95, 99]; // bumped per-poll movement
+    const PROGRESS_STEPS = [15, 35, 55, 75, 90, 98];
     let progressStepIndex = 0;
 
-    function setProgress(p){
-      fakeProgress = Math.max(fakeProgress, Math.min(p, 100));
-      progressBar.style.width = fakeProgress + '%';
-    }
-    function resetProgress(){
-      fakeProgress = 0;
-      progressStepIndex = 0;
-      setProgress(0);
-    }
+    function setProgress(p){ fakeProgress = Math.max(fakeProgress, Math.min(p, 100)); progressBar.style.width = fakeProgress + '%'; }
+    function resetProgress(){ fakeProgress = 0; progressStepIndex = 0; setProgress(0); }
     function tickProgressForInterval(intervalMs){
-      // First 4 ticks apply to 2-minute polls, next 2 to the first two 30s polls
       const isTwoMinPhase = intervalMs >= 120000;
-      const applyingIndex = progressStepIndex;
-
-      if (applyingIndex < 4 && isTwoMinPhase){
-        setProgress(PROGRESS_STEPS[applyingIndex]);
-        progressStepIndex++;
-      } else if (applyingIndex >= 4 && applyingIndex < 6 && intervalMs === 30000){
-        setProgress(PROGRESS_STEPS[applyingIndex]);
-        progressStepIndex++;
-      }
-      // After step 5 (index 5 -> 99%), we freeze until done.
+      const i = progressStepIndex;
+      if (i < 4 && isTwoMinPhase){ setProgress(PROGRESS_STEPS[i]); progressStepIndex++; }
+      else if (i >= 4 && i < 6 && intervalMs === 30000){ setProgress(PROGRESS_STEPS[i]); progressStepIndex++; }
     }
 
-    /* ---------- slot/symbol helpers (NEW) ---------- */
-    const SYMBOLS = {
-      Benchmark:             ['📈','🏁','💹','📊'],
-      Sentiment:             ['🧠','💬','🙂','🔍'],
-      Growth:                ['🌱','🚀','📈','🌿'],
-      CompetitiveIntensity:  ['🥊','⚔️','🏟️','🧩'],
-      CapitalIntensity:      ['🏗️','🧰','🏭','🔧'],
-      Overall:               ['⭐','🏆','🎯','✨']
-    };
+    // ---- brief formatting ----
+    function extractBrief(text){
+      const marker = '## Snapshot';
+      const i = text.indexOf(marker);
+      return i === -1 ? text : text.slice(i).trimStart();
+    }
+    function escapeHTML(s){
+      return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+    }
+    function formatBriefToHTML(text){
+      return text.split(/\r?\n/).map(line=>{
+        if(/^##\s+/.test(line)){
+          const title = escapeHTML(line.replace(/^##\s+/,'').trim());
+          return `<div class="md-h2">${title}</div>`;
+        }
+        if(!line.trim()) return '';
+        return `<p>${escapeHTML(line)}</p>`;
+      }).join('');
+    }
+
+    // ---- score rendering (no emojis, technical tiles) ----
     const ORDER = ['Benchmark','Sentiment','Growth','CompetitiveIntensity','CapitalIntensity','Overall'];
 
-    function animateValue(node, end, ms=1000){
-      const start = 0;
-      const t0 = performance.now();
+    function bandFor(val){
+      if (val >= 70) return {k:'good', txt:'High'};
+      if (val >= 40) return {k:'mid',  txt:'Medium'};
+      return {k:'bad', txt:'Low'};
+    }
+
+    function animateValue(node, end, ms=900){
+      const start = 0, t0 = performance.now();
       function step(t){
         const p = Math.min(1, (t - t0) / ms);
-        const val = start + (end - start) * p;
-        node.textContent = val.toFixed(1);
-        if(p < 1) requestAnimationFrame(step);
+        node.textContent = (start + (end - start) * p).toFixed(1);
+        if (p < 1) requestAnimationFrame(step);
         else node.textContent = end.toFixed(1);
       }
       requestAnimationFrame(step);
@@ -227,88 +232,50 @@
       wrap.innerHTML = '';
       if(!scores) return;
 
-      const keys = ORDER.filter(k => Object.prototype.hasOwnProperty.call(scores,k))
+      const keys = ORDER.filter(k => k in scores)
                         .concat(Object.keys(scores).filter(k => !ORDER.includes(k)));
 
-      keys.forEach((label)=>{
+      keys.forEach(label=>{
         const val = Number(scores[label]);
         const tile = document.createElement('div');
         tile.className = 'metric';
-        tile.style.color = hslForScore(val);
+        tile.style.borderColor = '#1f2a44';
 
-        const symbol = document.createElement('span');
-        symbol.className = 'symbol spin';
-        const pool = SYMBOLS[label] || ['🎰','✨','🔄','🎲'];
-        symbol.textContent = pool[Math.floor(Math.random()*pool.length)];
-
-        const valueEl = document.createElement('span');
-        valueEl.className = 'value';
-        valueEl.textContent = '0.0';
-
-        const lbl = document.createElement('span');
+        const lbl = document.createElement('div');
         lbl.className = 'label';
         lbl.textContent = label;
 
-        const bar = document.createElement('div');
-        bar.className = 'bar';
-        bar.style.width = '0%';
+        const valueEl = document.createElement('div');
+        valueEl.className = 'value';
+        valueEl.textContent = '0.0';
+        valueEl.style.color = hslForScore(val);
 
-        tile.appendChild(symbol);
-        tile.appendChild(valueEl);
+        const band = bandFor(val);
+        const chip = document.createElement('div');
+        chip.className = 'chip';
+        chip.textContent = band.txt;
+
+        const meter = document.createElement('div');
+        meter.className = 'meter ' + band.k;
+        const fill = document.createElement('i');
+        meter.appendChild(fill);
+
         tile.appendChild(lbl);
-        tile.appendChild(bar);
+        tile.appendChild(valueEl);
+        tile.appendChild(chip);
+        tile.appendChild(meter);
         wrap.appendChild(tile);
 
-        // slot-like emoji shuffle, then settle on the metric's final symbol
-        const shuffleAll = [].concat(...Object.values(SYMBOLS));
-        const shuffle = setInterval(()=>{
-          symbol.textContent = shuffleAll[Math.floor(Math.random()*shuffleAll.length)];
-        }, 90);
-
-        setTimeout(()=>{
-          clearInterval(shuffle);
-          symbol.textContent = pool[0];
-          symbol.classList.remove('spin');
-        }, 1200);
-
-        // animate value count-up and bar fill
-        requestAnimationFrame(()=>{ bar.style.width = val + '%'; });
-        animateValue(valueEl, val, 1100);
+        // animate
+        requestAnimationFrame(()=>{ fill.style.width = Math.max(0, Math.min(100, val)) + '%'; });
+        animateValue(valueEl, val, 1000);
       });
     }
 
-    function extractBrief(text){
-      const marker = '## Snapshot';
-      const idx    = text.indexOf(marker);
-      return idx === -1 ? text : text.slice(idx).trimStart();
-    }
-
-    // Escape HTML to keep output safe
-    function escapeHTML(s){
-      return s.replace(/&/g,'&amp;')
-              .replace(/</g,'&lt;')
-              .replace(/>/g,'&gt;')
-              .replace(/"/g,'&quot;')
-              .replace(/'/g,'&#39;');
-    }
-
-    // Convert "## " lines into styled headings (remove hashes)
-    function formatBriefToHTML(text){
-      const lines = text.split(/\r?\n/);
-      const html = lines.map(line=>{
-        if(/^##\s+/.test(line)){
-          const title = escapeHTML(line.replace(/^##\s+/, '').trim());
-          return `<div class="md-h2">${title}</div>`;
-        }
-        if(line.trim()==='') return '';
-        return `<p>${escapeHTML(line)}</p>`;
-      }).join('');
-      return html;
-    }
-
+    // ---- main flow ----
     document.getElementById('send').onclick = async () => {
       const idea = document.getElementById('idea').value.trim();
-      if(!idea) return alert('Please type an idea first!');
+      if(!idea) return alert('Please type an idea first.');
 
       const btn    = document.getElementById('send');
       const status = document.getElementById('status');
@@ -318,8 +285,8 @@
       scores.innerHTML = '';
       answer.textContent = '';
       resetProgress();
-      status.innerHTML  = '<span class="loading"></span> Submitting your idea...';
-      btn.disabled = true; btn.textContent = 'Evaluating...';
+      status.innerHTML = `<span class="spinner" aria-hidden="true"></span><span>Submitting...</span>`;
+      btn.disabled = true; btn.textContent = 'Evaluating…';
 
       try{
         const r1 = await fetch(SUBMIT_URL,{
@@ -328,26 +295,24 @@
           body:JSON.stringify({ idea })
         });
         const { jobId } = await r1.json();
-        if(!jobId) throw new Error('Submission failed ☹︎');
+        if(!jobId) throw new Error('No job id returned');
 
-        // brief pause so backend can queue work
-        await new Promise(res=>setTimeout(res,1500));
+        await new Promise(res=>setTimeout(res,1100));
 
-        // start polling: first poll immediately, then every 2 min until 8 min elapsed, then every 30s
         let done = false, tries = 0;
-        const pollStart = Date.now();
+        const t0 = Date.now();
 
         while(!done && tries < 60){
           const url = RESULT_URL + jobId + `?poll=${tries}`;
-          const r2  = await fetch(url, { cache: 'no-store' });
+          const r2 = await fetch(url, { cache:'no-store' });
 
-          if (r2.status !== 304) {
+          if (r2.status !== 304){
             const raw  = await r2.json();
-            const data = Array.isArray(raw)?raw[0]:raw;
+            const data = Array.isArray(raw) ? raw[0] : raw;
 
-            if(data.status === 'done'){
+            if (data.status === 'done'){
               done = true;
-              status.innerHTML = '<span class="success">✓</span> Evaluation completed!';
+              status.innerHTML = `<span>Completed</span>`;
               setProgress(100);
               renderScores(data.scores);
               const brief = extractBrief(data.brief || '');
@@ -356,22 +321,20 @@
             }
           }
 
-          // Decide next cadence
-          const elapsed = Date.now() - pollStart;
-          const intervalMs = elapsed < 8 * 60 * 1000 ? 120000 : 30000; // 2 min until 8 min, then 30s
-          status.innerHTML = `<span class="loading"></span> Working...`;
-
-          // Wait, then "tick" the fake progress according to the interval we just waited
+          const elapsed = Date.now() - t0;
+          const intervalMs = elapsed < 8*60*1000 ? 120000 : 30000;
+          status.innerHTML = `<span class="spinner" aria-hidden="true"></span><span>Processing…</span>`;
           await new Promise(res=>setTimeout(res, intervalMs));
           tickProgressForInterval(intervalMs);
-
           tries++;
         }
 
-        if(!done) status.textContent = 'Timed out after ~36 minutes ⏱';
+        if(!done){
+          status.innerHTML = `<span>Timed out after ~36 minutes</span>`;
+        }
 
       }catch(err){
-        status.textContent = `Error: ${err.message}`;
+        status.innerHTML = `<span>Error: ${err.message}</span>`;
       }finally{
         btn.disabled = false; btn.textContent = 'Evaluate Idea';
       }

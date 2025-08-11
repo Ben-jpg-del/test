@@ -110,10 +110,9 @@
     .send-btn:hover{transform:translateY(-50%) translateX(0) scale(1.02)}
     .send-btn:disabled{opacity:.6;cursor:not-allowed}
     .send-btn::before{
-      content:'';display:block;width:18px;height:18px;margin:0 auto;
-      background:#C0C0C0;
-      -webkit-mask:url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="%23fff" d="M2.01 21 23 12 2.01 3 2 10l15 2-15 2z"/></svg>') center/contain no-repeat;
-              mask:url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="%23fff" d="M2.01 21 23 12 2.01 3 2 10l15 2-15 2z"/></svg>') center/contain no-repeat;
+      content:'→';display:block;width:18px;height:18px;margin:0 auto;
+      background:transparent;
+      color:#C0C0C0;font-size:18px;line-height:1;text-align:center;
     }
 
     /* Metrics & brief in results bubble */

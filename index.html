@@ -16,14 +16,13 @@
       min-height:100vh;color:#C0C0C0;
     }
 
-    /* App shell (full screen on desktop) */
     .app{
       min-height:100vh;
       display:flex;flex-direction:column;
-      max-width:1200px;margin:0 auto;padding:12px 16px;
+      padding:12px 16px;
     }
 
-    /* Header with brand + thinking state */
+    /* Header */
     .chat-header{
       display:flex;align-items:center;justify-content:space-between;
       gap:16px;padding:8px 4px 12px;
@@ -34,6 +33,7 @@
       background:rgba(0,0,0,.35);border:1px solid #3E84C6;
       display:grid;place-items:center;overflow:hidden;
       box-shadow:0 8px 20px rgba(0,0,0,.25);
+      flex:0 0 36px;
     }
     .avatar svg{width:100%;height:100%;display:block}
     .title{
@@ -47,11 +47,9 @@
       display:flex;align-items:center;gap:10px;min-height:28px;
     }
     .thinking .icon{filter:drop-shadow(0 0 6px rgba(62,132,198,.6))}
-    #status{
-      font-size:.95rem;min-width:140px;
-    }
+    #status{font-size:.95rem;min-width:140px}
 
-    /* Progress bar lives beside thinking text */
+    /* Progress beside thinking */
     .progress{
       width:180px;height:8px;border:1px solid #3E84C6;border-radius:6px;
       background:rgba(62,132,198,.15);overflow:hidden;
@@ -81,29 +79,44 @@
       background:rgba(62,132,198,.12);border-color:#7db6ea;
     }
 
-    /* Composer row */
+    /* Composer: input spans from avatar to right edge */
     .composer{
-      display:flex;align-items:flex-end;gap:10px;margin-top:12px;
+      display:flex;align-items:center;gap:10px;margin-top:12px;
       position:sticky;bottom:0;padding-top:10px;background:linear-gradient(180deg,transparent,rgba(0,0,0,.25));
     }
     .composer .avatar{flex:0 0 36px}
-    .composer-box{flex:1;display:flex;gap:8px;align-items:flex-end}
+    .composer-box{
+      flex:1;position:relative;display:flex;align-items:center;
+    }
+
+    /* Compact chatbox ~40px to match avatar height */
     textarea{
-      flex:1;min-height:54px;max-height:180px;resize:vertical;
-      padding:12px;border:2px solid #3E84C6;border-radius:12px;
-      background:rgba(0,0,0,.6);color:#C0C0C0;font-size:15px;transition:.3s;
+      width:100%;height:40px;min-height:40px;max-height:40px;
+      padding:8px 48px 8px 12px; /* room for arrow button */
+      border:2px solid #3E84C6;border-radius:20px;
+      background:rgba(0,0,0,.6);color:#C0C0C0;font-size:15px;
+      transition:.3s;resize:none;overflow-y:hidden;
     }
     textarea:focus{outline:none;border-color:#C0C0C0;box-shadow:0 0 18px rgba(192,192,192,.25)}
 
-    button{
-      padding:12px 16px;font-size:1rem;font-weight:600;
-      background:linear-gradient(45deg,#023E89,#3E84C6);color:#C0C0C0;
-      border:none;border-radius:10px;cursor:pointer;transition:.25s;text-transform:uppercase;
+    /* Send button as in-field arrow (text hidden; JS may change textContent) */
+    .send-btn{
+      position:absolute;right:6px;top:50%;transform:translateY(-50%);
+      width:38px;height:32px;border:none;border-radius:10px;cursor:pointer;
+      background:linear-gradient(45deg,#023E89,#3E84C6);
+      box-shadow:0 6px 16px rgba(62,132,198,.35);
+      color:transparent;font-size:0; /* hide any text set by JS */
     }
-    button:hover{transform:translateY(-2px);box-shadow:0 10px 22px rgba(62,132,198,.35)}
-    button:disabled{opacity:.6;cursor:not-allowed;transform:none}
+    .send-btn:hover{transform:translateY(-50%) translateX(0) scale(1.02)}
+    .send-btn:disabled{opacity:.6;cursor:not-allowed}
+    .send-btn::before{
+      content:'';display:block;width:18px;height:18px;margin:0 auto;
+      background:#C0C0C0;
+      -webkit-mask:url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="%23fff" d="M2.01 21 23 12 2.01 3 2 10l15 2-15 2z"/></svg>') center/contain no-repeat;
+              mask:url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="%23fff" d="M2.01 21 23 12 2.01 3 2 10l15 2-15 2z"/></svg>') center/contain no-repeat;
+    }
 
-    /* Metrics + brief inside a bot bubble */
+    /* Metrics & brief in results bubble */
     .metrics{display:flex;flex-wrap:wrap;gap:14px;margin-top:6px}
     .metric{
       flex:1 1 130px;position:relative;padding:14px 10px 12px;
@@ -115,7 +128,7 @@
     .metric .label{font-size:.72rem;letter-spacing:1px;text-transform:uppercase;opacity:.75;margin-top:4px;display:block}
     .metric .bar{position:absolute;left:0;bottom:0;height:3px;background:currentColor;border-radius:0 0 10px 10px}
 
-    #answer{margin-top:14px;padding:14px;border-radius:10px;background:rgba(0,0,0,.35);border:1px solid #3E84C6;max-height:420px;overflow:auto;opacity:1;transform:none}
+    #answer{margin-top:14px;padding:14px;border-radius:10px;background:rgba(0,0,0,.35);border:1px solid #3E84C6;max-height:420px;overflow:auto}
     #answer .md-h2{font-size:1.1em;font-weight:700;margin:10px 0 6px}
     #answer p{margin:6px 0}
     #answer::-webkit-scrollbar{width:8px}
@@ -126,9 +139,8 @@
     @keyframes spin{to{transform:rotate(360deg)}}
 
     @media(max-width:768px){
-      .app{padding:8px}
       .progress{width:120px}
-      textarea{min-height:48px}
+      textarea{height:40px;min-height:40px;max-height:40px}
     }
   </style>
 </head>
@@ -169,8 +181,6 @@
 
     <!-- Chat stream -->
     <div id="chat" class="chat" role="log" aria-live="polite">
-      <!-- User’s prompt bubble appears after submit -->
-      <!-- Results bubble (scores + brief) -->
       <div id="resultBubble" class="message bot" style="display:none">
         <div class="bubble" style="width:100%">
           <div id="scores" class="metrics"></div>
@@ -182,7 +192,7 @@
     <!-- Composer -->
     <div class="composer">
       <div class="avatar" title="ROO — Risk · Odds · Opportunity" aria-hidden="true">
-        <!-- ROO SVG (same as header) -->
+        <!-- same ROO SVG -->
         <svg viewBox="0 0 64 64" role="img" aria-hidden="true">
           <defs>
             <linearGradient id="rooGrad2" x1="0" y1="0" x2="1" y2="1">
@@ -201,7 +211,8 @@
 
       <div class="composer-box">
         <textarea id="idea" placeholder="Describe your startup idea in detail..."></textarea>
-        <button id="send">Evaluate Idea</button>
+        <!-- Send arrow button; same id so JS logic remains unchanged -->
+        <button id="send" class="send-btn" title="Send" aria-label="Send">Send</button>
       </div>
     </div>
   </div>
@@ -212,7 +223,7 @@
 
     const hslForScore = s => `hsl(${Math.max(0, Math.min(120, s))}, 70%, 50%)`;
 
-    // Progress helpers (unchanged logic, IDs preserved)
+    // Progress helpers
     const progressBar = document.getElementById('progressBar');
     let fakeProgress = 0;
     const PROGRESS_STEPS = [20, 40, 60, 80, 95, 99];
@@ -232,7 +243,6 @@
       else if (i >= 4 && i < 6 && intervalMs === 30000){ setProgress(PROGRESS_STEPS[i]); progressStepIndex++; }
     }
 
-    // Score tiles (unchanged)
     const SYMBOLS = {
       Benchmark:['📈','🏁','💹','📊'],
       Sentiment:['🧠','💬','🙂','🔍'],
@@ -318,7 +328,6 @@
       }).join('');
     }
 
-    // Chat helpers (display-only)
     const chat = document.getElementById('chat');
     function addUserBubble(text){
       const row = document.createElement('div');
@@ -343,7 +352,7 @@
       answer.textContent = '';
       resetProgress();
       status.innerHTML  = '<span class="loading" aria-hidden="true"></span> Submitting…';
-      btn.disabled = true; btn.textContent = 'Evaluating…';
+      btn.disabled = true; btn.textContent = 'Evaluating…'; // text hidden by CSS; arrow stays via ::before
 
       try{
         const r1 = await fetch(SUBMIT_URL,{
@@ -395,7 +404,7 @@
         document.getElementById('status').textContent = `Error: ${err.message}`;
       }finally{
         const btn = document.getElementById('send');
-        btn.disabled = false; btn.textContent = 'Evaluate Idea';
+        btn.disabled = false; btn.textContent = 'Send'; // text still hidden; arrow remains
       }
     };
 

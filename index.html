@@ -253,7 +253,12 @@
         const band = bandFor(val);
         const chip = document.createElement('div');
         chip.className = 'chip';
-        chip.textContent = band.txt;
+        // Invert ONLY the chip label for CompetitiveIntensity and CapitalIntensity
+        let chipText = band.txt;
+        if (label === 'CompetitiveIntensity' || label === 'CapitalIntensity') {
+          chipText = band.k === 'good' ? 'Low' : band.k === 'mid' ? 'Medium' : 'High';
+        }
+        chip.textContent = chipText;
 
         const meter = document.createElement('div');
         meter.className = 'meter ' + band.k;

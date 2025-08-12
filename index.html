@@ -183,7 +183,7 @@
     // ---- progress handling ----
     const progressBar = document.getElementById('progressBar');
     let fakeProgress = 0;
-    const PROGRESS_STEPS = [15, 35, 55, 75, 90, 98];
+    const PROGRESS_STEPS = [12, 30, 48, 66, 78, 90, 98];
     let progressStepIndex = 0;
 
     function setProgress(p){ fakeProgress = Math.max(fakeProgress, Math.min(p, 100)); progressBar.style.width = fakeProgress + '%'; }
@@ -191,8 +191,8 @@
     function tickProgressForInterval(intervalMs){
       const isTwoMinPhase = intervalMs >= 120000;
       const i = progressStepIndex;
-      if (i < 4 && isTwoMinPhase){ setProgress(PROGRESS_STEPS[i]); progressStepIndex++; }
-      else if (i >= 4 && i < 6 && intervalMs === 30000){ setProgress(PROGRESS_STEPS[i]); progressStepIndex++; }
+      if (i < 5 && isTwoMinPhase){ setProgress(PROGRESS_STEPS[i]); progressStepIndex++; }
+      else if (i >= 5 && i < 7 && intervalMs === 30000){ setProgress(PROGRESS_STEPS[i]); progressStepIndex++; }
     }
 
     // ---- brief formatting ----
@@ -335,7 +335,7 @@
           }
 
           const elapsed = Date.now() - t0;
-          const intervalMs = elapsed < 8*60*1000 ? 120000 : 30000;
+          const intervalMs = elapsed < 10*60*1000 ? 120000 : 30000;
           status.innerHTML = `<span class="spinner" aria-hidden="true"></span><span>Processing…</span>`;
           await new Promise(res=>setTimeout(res, intervalMs));
           tickProgressForInterval(intervalMs);

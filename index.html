@@ -205,7 +205,7 @@
       return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
     }
     function formatBriefToHTML(text){
-      return text split(/\r?\n/).map(line=>{
+      return text.split(/\r?\n/).map(line=>{
         if(/^##\s+/.test(line)){
           const title = escapeHTML(line.replace(/^##\s+/,'').trim());
           return `<div class="md-h2">${title}</div>`;
@@ -335,8 +335,7 @@
           }
 
           const elapsed = Date.now() - t0;
-          // CHANGED: switch to 30s after 10 minutes (was 8)
-          const intervalMs = elapsed < 10*60*1000 ? 120000 : 30000;
+          const intervalMs = elapsed < 8*60*1000 ? 120000 : 30000;
           status.innerHTML = `<span class="spinner" aria-hidden="true"></span><span>Processing…</span>`;
           await new Promise(res=>setTimeout(res, intervalMs));
           tickProgressForInterval(intervalMs);

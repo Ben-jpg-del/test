@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>ROO AI</title>
 
-  <!-- JetBrains Mono -->
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
 
   <style>
@@ -21,9 +20,7 @@
       --mid:#f59e0b;
       --bad:#ef4444;
     }
-
     *{margin:0;padding:0;box-sizing:border-box}
-
     body{
       font-family:'JetBrains Mono',monospace;
       background:
@@ -37,7 +34,6 @@
       justify-content:center;
       padding:32px;
     }
-
     .container{
       width:100%;
       max-width:780px;
@@ -47,25 +43,13 @@
       padding:28px;
       box-shadow:0 8px 40px rgba(0,0,0,.35), inset 0 0 0 1px rgba(255,255,255,.02);
     }
-
-    header{
-      display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;
-    }
-    .brand{
-      display:flex;align-items:center;gap:12px;
-      letter-spacing:.5px;
-    }
-    .logo{
-      width:26px;height:26px;border-radius:6px;
-      background:linear-gradient(135deg,var(--accent),var(--accent-2));
-      box-shadow:0 0 0 1px rgba(62,132,198,.35), 0 6px 18px rgba(62,132,198,.25);
-    }
+    header{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
+    .brand{display:flex;align-items:center;gap:12px;letter-spacing:.5px}
+    .logo{width:26px;height:26px;border-radius:6px;background:linear-gradient(135deg,var(--accent),var(--accent-2));box-shadow:0 0 0 1px rgba(62,132,198,.35), 0 6px 18px rgba(62,132,198,.25)}
     h1{font-size:18px;font-weight:700}
     .sub{font-size:12px;color:var(--muted)}
 
-    label{
-      display:block;margin:8px 0 8px 0;font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;
-    }
+    label{display:block;margin:8px 0 8px 0;font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em}
     textarea{
       width:100%;min-height:120px;resize:vertical;
       background:#0b1020;border:1px solid var(--border);border-radius:10px;
@@ -91,10 +75,7 @@
       padding:12px 14px;font-size:13px;color:var(--muted);
       display:flex;align-items:center;gap:10px;min-height:44px;
     }
-    .spinner{
-      width:16px;height:16px;border:2px solid rgba(255,255,255,.15);
-      border-top-color:var(--accent);border-radius:50%;animation:spin 1s linear infinite;
-    }
+    .spinner{width:16px;height:16px;border:2px solid rgba(255,255,255,.15);border-top-color:var(--accent);border-radius:50%;animation:spin 1s linear infinite}
     @keyframes spin{to{transform:rotate(360deg)}}
 
     .progress{height:8px;border-radius:6px;background:#0b1020;border:1px solid var(--border);margin-top:10px;overflow:hidden}
@@ -105,6 +86,7 @@
     @media (max-width:720px){.metrics{grid-template-columns:1fr}}
 
     .metric{
+      position:relative;
       border:1px solid var(--border);border-radius:12px;background:#0b1020;
       padding:14px 14px 12px;display:grid;grid-template-columns:1fr auto;gap:8px 12px;
     }
@@ -115,33 +97,29 @@
       font-size:11px;color:#cdd6e3;background:#10182b;border:1px solid var(--border);
       padding:4px 8px;border-radius:999px
     }
-    .meter{
-      grid-column:1 / -1;height:6px;border-radius:5px;background:#0a1326;border:1px solid var(--border);overflow:hidden
-    }
-    .meter > i{display:block;height:100%;width:0%;}
+    .meter{grid-column:1 / -1;height:6px;border-radius:5px;background:#0a1326;border:1px solid var(--border);overflow:hidden}
+    .meter > i{display:block;height:100%;width:0%}
     .meter.good > i{background:linear-gradient(90deg,#0ea75a,#61d497)}
     .meter.mid > i {background:linear-gradient(90deg,#f59e0b,#ffd166)}
     .meter.bad > i {background:linear-gradient(90deg,#ef4444,#fb7185)}
 
-    /* brief panel */
-    #answer{
-      margin-top:18px;border:1px solid var(--border);border-radius:12px;background:#0b1020;padding:18px;
-      /* removed max-height cap */
+    /* hover card (appears above tile on hover) */
+    .hovercard{
+      position:absolute;left:0;right:0;bottom:calc(100% + 10px);
+      background:#0b1020;border:1px solid var(--border);border-radius:10px;
+      padding:10px;box-shadow:0 8px 24px rgba(0,0,0,.35);
+      display:none;opacity:0;transform:translateY(4px);
+      transition:opacity .15s ease, transform .15s ease;
+      pointer-events:none;z-index:20
     }
-    #answer .md-h2{font-size:14px;font-weight:700;margin:12px 0 6px;color:#cfd6e6}
-    #answer p{margin:6px 0;font-size:13px;color:#d8dee9}
-    #answer::-webkit-scrollbar{width:10px}
-    #answer::-webkit-scrollbar-thumb{background:#16203a;border-radius:8px}
-
-    .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
-
-    /* —— Mobile-only button sizing —— */
-    @media (max-width:480px){
-      button{flex:0 0 120px;padding:10px 12px;font-size:13px}
-    }
-    @media (max-width:360px){
-      button{flex:0 0 104px;padding:8px 10px;font-size:12px}
-    }
+    .metric:hover .hovercard{display:block;opacity:1;transform:translateY(0)}
+    .hovercard h4{font-size:12px;font-weight:700;margin:0 0 6px;color:#cfd6e6;display:flex;align-items:center;justify-content:space-between;gap:8px}
+    .hovercard .badge{font-size:10px;padding:2px 6px;border-radius:999px;border:1px solid var(--border);background:#10182b;color:#cdd6e3}
+    .hovercard p{font-size:12px;color:#d8dee9;line-height:1.4;margin:4px 0 6px}
+    .hovercard ul{margin-left:16px}
+    .hovercard li{font-size:12px;color:#cbd5e1;margin:2px 0}
+    .mini-meter{grid-column:1 / -1;height:4px;border-radius:4px;background:#0a1326;border:1px solid var(--border);overflow:hidden;margin-top:6px}
+    .mini-meter > i{display:block;height:100%;width:0%}
   </style>
 </head>
 <body>
@@ -177,10 +155,8 @@
     const SUBMIT_URL = 'https://benzh88.app.n8n.cloud/webhook/6b09d0aa-a903-4239-a2bb-9cbff340c34a';
     const RESULT_URL = 'https://benzh88.app.n8n.cloud/webhook/a6e524b5-b6f5-452a-a7bd-82771d08c8af/result/';
 
-    // color mapping stays continuous while tiles use qualitative bands
     const hslForScore = s => `hsl(${Math.max(0, Math.min(120, s))}, 70%, 50%)`;
 
-    // ---- progress handling ----
     const progressBar = document.getElementById('progressBar');
     let fakeProgress = 0;
     const PROGRESS_STEPS = [12, 30, 48, 66, 78, 90, 98];
@@ -195,14 +171,13 @@
       else if (i >= 5 && i < 7 && intervalMs === 30000){ setProgress(PROGRESS_STEPS[i]); progressStepIndex++; }
     }
 
-    // ---- brief formatting ----
     function extractBrief(text){
       const marker = '## Snapshot';
       const i = text.indexOf(marker);
       return i === -1 ? text : text.slice(i).trimStart();
     }
     function escapeHTML(s){
-      return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+      return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
     }
     function formatBriefToHTML(text){
       return text.split(/\r?\n/).map(line=>{
@@ -215,15 +190,12 @@
       }).join('');
     }
 
-    // ---- score rendering (no emojis, technical tiles) ----
     const ORDER = ['Benchmark','Sentiment','Growth','CompetitiveIntensity','CapitalIntensity','Overall'];
-
     function bandFor(val){
       if (val >= 70) return {k:'good', txt:'High'};
       if (val >= 40) return {k:'mid',  txt:'Medium'};
       return {k:'bad', txt:'Low'};
     }
-
     function animateValue(node, end, ms=900){
       const start = 0, t0 = performance.now();
       function step(t){
@@ -235,11 +207,65 @@
       requestAnimationFrame(step);
     }
 
-    function renderScores(scores){
+    // --- cards helpers ---
+    const KEY_TO_LABEL = {
+      overall:'Overall',
+      growth:'Growth',
+      benchmark:'Benchmark',
+      sentiment:'Sentiment',
+      competitive:'CompetitiveIntensity',
+      capital:'CapitalIntensity'
+    };
+    function toCardsArray(x){
+      if (Array.isArray(x)) return x;
+      if (typeof x === 'string') {
+        try { const p = JSON.parse(x); return Array.isArray(p) ? p : []; } catch { return []; }
+      }
+      return [];
+    }
+    function indexCards(arr){
+      const map = {};
+      toCardsArray(arr).forEach(c=>{
+        const lbl = KEY_TO_LABEL[(c.key||'').toLowerCase()];
+        if (lbl) map[lbl] = c;
+      });
+      return map;
+    }
+    function makeHoverCard(card, label, val){
+      const hc = document.createElement('div');
+      hc.className = 'hovercard';
+      const h4 = document.createElement('h4');
+      h4.textContent = card.title || label;
+      const badge = document.createElement('span');
+      badge.className = 'badge';
+      badge.textContent = card.badge || '';
+      h4.appendChild(badge);
+      const p = document.createElement('p');
+      p.textContent = card.summary || '';
+      hc.appendChild(h4); hc.appendChild(p);
+      if (Array.isArray(card.bullets) && card.bullets.length){
+        const ul = document.createElement('ul');
+        card.bullets.slice(0,2).forEach(b=>{
+          const li = document.createElement('li'); li.textContent = b; ul.appendChild(li);
+        });
+        hc.appendChild(ul);
+      }
+      const meter = document.createElement('div');
+      const band = bandFor(val);
+      meter.className = 'mini-meter meter ' + band.k;
+      const fill = document.createElement('i');
+      meter.appendChild(fill);
+      hc.appendChild(meter);
+      requestAnimationFrame(()=>{ fill.style.width = Math.max(0, Math.min(100, Number(card.meter?.value ?? val))) + '%'; });
+      return hc;
+    }
+
+    function renderScores(scores, cardsRaw){
       const wrap = document.getElementById('scores');
       wrap.innerHTML = '';
       if(!scores) return;
 
+      const cardsMap = indexCards(cardsRaw);
       const keys = ORDER.filter(k => k in scores)
                         .concat(Object.keys(scores).filter(k => !ORDER.includes(k)));
 
@@ -261,7 +287,6 @@
         const band = bandFor(val);
         const chip = document.createElement('div');
         chip.className = 'chip';
-        // Invert ONLY the chip label for CompetitiveIntensity and CapitalIntensity
         let chipText = band.txt;
         if (label === 'CompetitiveIntensity' || label === 'CapitalIntensity') {
           chipText = band.k === 'good' ? 'Low' : band.k === 'mid' ? 'Medium' : 'High';
@@ -273,13 +298,19 @@
         const fill = document.createElement('i');
         meter.appendChild(fill);
 
+        // hover card (if available)
+        const card = cardsMap[label];
+        if (card) {
+          const hc = makeHoverCard(card, label, val);
+          tile.appendChild(hc);
+        }
+
         tile.appendChild(lbl);
         tile.appendChild(valueEl);
         tile.appendChild(chip);
         tile.appendChild(meter);
         wrap.appendChild(tile);
 
-        // animate
         requestAnimationFrame(()=>{ fill.style.width = Math.max(0, Math.min(100, val)) + '%'; });
         animateValue(valueEl, val, 1000);
       });
@@ -327,7 +358,7 @@
               done = true;
               status.innerHTML = `<span>Completed</span>`;
               setProgress(100);
-              renderScores(data.scores);
+              renderScores(data.scores, data.cards);
               const brief = extractBrief(data.brief || '');
               answer.innerHTML = formatBriefToHTML(brief);
               break;

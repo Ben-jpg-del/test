@@ -101,6 +101,16 @@
     #answer .lead{
       font-size:13px; color:#d8dee9; margin:2px 0 8px;
     }
+
+    /* ===== NEW: tap/keyboard toggle for hovercards on mobile ===== */
+    .metric[aria-expanded="true"] .hovercard{
+      opacity:1; visibility:visible; transform:translate(-50%,0);
+    }
+    @media (hover:none){
+      .metric:hover .hovercard{
+        opacity:0; visibility:hidden; transform:translate(-50%,6px);
+      }
+    }
   </style>
 </head>
 <body>
@@ -315,6 +325,29 @@
         tile.appendChild(chip);
         tile.appendChild(meter);
         wrap.appendChild(tile);
+
+        // ===== NEW: tap/keyboard support for hovercards =====
+        tile.setAttribute('role','button');
+        tile.setAttribute('tabindex','0');
+        tile.setAttribute('aria-expanded','false');
+
+        function closeAll() {
+          document.querySelectorAll('.metric[aria-expanded="true"]')
+            .forEach(el => el.setAttribute('aria-expanded','false'));
+        }
+
+        tile.addEventListener('click', () => {
+          const open = tile.getAttribute('aria-expanded') === 'true';
+          closeAll();
+          tile.setAttribute('aria-expanded', String(!open));
+        });
+
+        tile.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); tile.click(); }
+          if (e.key === 'Escape') { tile.setAttribute('aria-expanded','false'); }
+        });
+
+        tile.addEventListener('blur', () => tile.setAttribute('aria-expanded','false'));
 
         requestAnimationFrame(()=>{ fill.style.width = Math.max(0, Math.min(100, val)) + '%'; });
         animateValue(valueEl, val, 1000);

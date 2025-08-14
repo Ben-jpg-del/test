@@ -88,6 +88,19 @@
     .hovercard p{font-size:12px;color:#d8dee9;line-height:1.4;margin:4px 0 6px}
     .hovercard ul{margin-left:16px}
     .hovercard li{font-size:12px;color:#cbd5e1;margin:2px 0}
+
+    /* ===== NEW: investor-grade brief headings (no symbols needed) ===== */
+    #answer .md-h1{
+      font-size:16px; font-weight:700; letter-spacing:.02em;
+      margin:14px 0 6px; color:#e2e8f0;
+    }
+    #answer .md-h3{
+      font-size:12px; font-weight:600; text-transform:uppercase;
+      letter-spacing:.08em; color:#9aa4b2; margin:10px 0 4px;
+    }
+    #answer .lead{
+      font-size:13px; color:#d8dee9; margin:2px 0 8px;
+    }
   </style>
 </head>
 <body>
@@ -147,15 +160,52 @@
     function escapeHTML(s){
       return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
     }
+
+    /* ===== NEW: symbol-free formatter for investor-grade headings ===== */
     function formatBriefToHTML(text){
-      return text.split(/\r?\n/).map(line=>{
-        if(/^##\s+/.test(line)){
-          const title = escapeHTML(line.replace(/^##\s+/,'').trim());
-          return `<div class="md-h2">${title}</div>`;
+      const SECTIONS = new Set([
+        'Snapshot',
+        'Market & Growth',
+        'Consumer Trends',
+        'Competitor Landscape',
+        'Founder–Market Fit',
+        'Go-to-Market Hypotheses (2-week tests)',
+        'Vacancy Map & Wedge',
+        'Competitors (from sources)',
+        'Top Risks & 2-Week Kill Tests',
+        'Sources'
+      ]);
+
+      const out = [];
+      for (const raw of text.split(/\r?\n/)){
+        const line = raw.trim();
+        if (!line){ out.push(''); continue; }
+
+        // Backward-compat: accept old "## " markers if they show up
+        if (line.startsWith('## ')){
+          out.push(`<div class="md-h1">${escapeHTML(line.slice(3))}</div>`);
+          continue;
         }
-        if(!line.trim()) return '';
-        return `<p>${escapeHTML(line)}</p>`;
-      }).join('');
+
+        // Section headers with NO symbols
+        if (SECTIONS.has(line)){
+          out.push(`<div class="md-h1">${escapeHTML(line)}</div>`);
+          continue;
+        }
+
+        // Subheaders like:
+        // "- **Title** — details"  OR  "- Title — details"  OR  "Title — details"
+        const m = line.match(/^[-•]?\s*(?:\*\*)?(.+?)(?:\*\*)?\s+—\s+(.*)$/);
+        if (m && m[1] && m[2] && m[1].length < 140){
+          out.push(`<div class="md-h3">${escapeHTML(m[1])}</div>`);
+          out.push(`<p class="lead">— ${escapeHTML(m[2])}</p>`);
+          continue;
+        }
+
+        // Default paragraph
+        out.push(`<p>${escapeHTML(line)}</p>`);
+      }
+      return out.join('');
     }
 
     const ORDER = ['Benchmark','Sentiment','Growth','CompetitiveIntensity','CapitalIntensity','Overall'];

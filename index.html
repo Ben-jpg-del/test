@@ -34,7 +34,7 @@
       color:var(--text);padding:14px;font-size:14px;line-height:1.5;transition:border-color .2s, box-shadow .2s;
     }
     textarea:focus{outline:none;border-color:#2b3c5a;box-shadow:0 0 0 3px rgba(62,132,198,.15)}
-    .row{display:flex;gap:12px;margin-top:12px;min-width:0;} /* allow children to shrink inside container */
+    .row{display:flex;gap:12px;margin-top:12px;min-width:0;}
     button{
       appearance:none;border:0;border-radius:10px;cursor:pointer;padding:12px 16px;font-size:14px;font-weight:600;
       background:linear-gradient(135deg,var(--accent),var(--accent-2)); color:#0b0f1a;flex:0 0 160px; box-shadow:0 6px 18px rgba(62,132,198,.25);
@@ -45,19 +45,18 @@
     #status{
       flex:1;border:1px dashed var(--border);border-radius:10px;padding:12px 14px;font-size:13px;color:var(--muted);
       display:flex;align-items:center;gap:10px;min-height:44px;
-      min-width:0; /* key: let flex item shrink on small screens */
+      min-width:0;
     }
     .spinner{width:16px;height:16px;border:2px solid rgba(255,255,255,.15);border-top-color:var(--accent);border-radius:50%;animation:spin 1s linear infinite}
     @keyframes spin{to{transform:rotate(360deg)}}
     .progress{height:8px;border-radius:6px;background:#0b1020;border:1px solid var(--border);margin-top:10px;overflow:hidden}
     .progress-inner{height:100%;width:0%;background:linear-gradient(90deg,var(--accent),var(--accent-2));transition:width .6s ease}
 
-    /* metrics grid */
     .metrics{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:18px}
     @media (max-width:720px){.metrics{grid-template-columns:1fr}}
 
     .metric{
-      position:relative; /* needed for hover card positioning */
+      position:relative;
       border:1px solid var(--border);border-radius:12px;background:#0b1020;
       padding:14px 14px 12px;display:grid;grid-template-columns:1fr auto;gap:8px 12px;
     }
@@ -70,7 +69,6 @@
     .meter.mid > i {background:linear-gradient(90deg,#f59e0b,#ffd166)}
     .meter.bad > i {background:linear-gradient(90deg,#ef4444,#fb7185)}
 
-    /* brief panel */
     #answer{margin-top:18px;border:1px solid var(--border);border-radius:12px;background:#0b1020;padding:18px}
     #answer .md-h2{font-size:14px;font-weight:700;margin:12px 0 6px;color:#cfd6e6}
     #answer p{margin:6px 0;font-size:13px;color:#d8dee9}
@@ -78,7 +76,6 @@
     #answer::-webkit-scrollbar-thumb{background:#16203a;border-radius:8px}
     .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
 
-    /* hover card (pure add-on; does not alter layout) */
     .hovercard{
       position:absolute; left:50%; bottom:calc(100% + 10px); transform:translate(-50%,6px);
       max-width:min(360px, calc(100% - 16px)); width:max-content;
@@ -93,36 +90,18 @@
     .hovercard ul{margin-left:16px}
     .hovercard li{font-size:12px;color:#cbd5e1;margin:2px 0}
 
-    /* ===== NEW: investor-grade brief headings (no symbols needed) ===== */
-    #answer .md-h1{
-      font-size:16px; font-weight:700; letter-spacing:.02em;
-      margin:14px 0 6px; color:#e2e8f0;
-    }
-    #answer .md-h3{
-      font-size:12px; font-weight:600; text-transform:uppercase;
-      letter-spacing:.08em; color:#9aa4b2; margin:10px 0 4px;
-    }
-    #answer .lead{
-      font-size:13px; color:#d8dee9; margin:2px 0 8px;
-    }
+    #answer .md-h1{font-size:16px;font-weight:700;letter-spacing:.02em;margin:14px 0 6px;color:#e2e8f0}
+    #answer .md-h3{font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:#9aa4b2;margin:10px 0 4px}
+    #answer .lead{font-size:13px;color:#d8dee9;margin:2px 0 8px}
 
-    /* ===== NEW: tap/keyboard toggle for hovercards on mobile ===== */
-    .metric[aria-expanded="true"] .hovercard{
-      opacity:1; visibility:visible; transform:translate(-50%,0);
-    }
+    .metric[aria-expanded="true"] .hovercard{opacity:1;visibility:visible;transform:translate(-50%,0)}
     @media (hover:none){
-      .metric:hover .hovercard{
-        opacity:0; visibility:hidden; transform:translate(-50%,6px);
-      }
+      .metric:hover .hovercard{opacity:0;visibility:hidden;transform:translate(-50%,6px)}
     }
 
-    /* ===== Phone-specific fix so status frame stays inside ===== */
     @media (max-width:480px){
       button{flex:0 0 128px;padding:10px 12px;font-size:13px}
-      #status{
-        padding:10px 12px;font-size:12px;
-        white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
-      }
+      #status{padding:10px 12px;font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
     }
     @media (max-width:360px){
       button{flex:0 0 110px;padding:8px 10px;font-size:12px}
@@ -188,19 +167,11 @@
       return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
     }
 
-    /* ===== NEW: symbol-free formatter for investor-grade headings ===== */
     function formatBriefToHTML(text){
       const SECTIONS = new Set([
-        'Snapshot',
-        'Market & Growth',
-        'Consumer Trends',
-        'Competitor Landscape',
-        'Founder–Market Fit',
-        'Go-to-Market Hypotheses (2-week tests)',
-        'Vacancy Map & Wedge',
-        'Competitors (from sources)',
-        'Top Risks & 2-Week Kill Tests',
-        'Sources'
+        'Snapshot','Market & Growth','Consumer Trends','Competitor Landscape','Founder–Market Fit',
+        'Go-to-Market Hypotheses (2-week tests)','Vacancy Map & Wedge','Competitors (from sources)',
+        'Top Risks & 2-Week Kill Tests','Sources'
       ]);
 
       const out = [];
@@ -212,19 +183,16 @@
           out.push(`<div class="md-h1">${escapeHTML(line.slice(3))}</div>`);
           continue;
         }
-
         if (SECTIONS.has(line)){
           out.push(`<div class="md-h1">${escapeHTML(line)}</div>`);
           continue;
         }
-
         const m = line.match(/^[-•]?\s*(?:\*\*)?(.+?)(?:\*\*)?\s+—\s+(.*)$/);
         if (m && m[1] && m[2] && m[1].length < 140){
           out.push(`<div class="md-h3">${escapeHTML(m[1])}</div>`);
           out.push(`<p class="lead">— ${escapeHTML(m[2])}</p>`);
           continue;
         }
-
         out.push(`<p>${escapeHTML(line)}</p>`);
       }
       return out.join('');
@@ -247,14 +215,22 @@
       requestAnimationFrame(step);
     }
 
-    /* ---------- Hover cards: helpers (non-breaking) ---------- */
+    // --- NEW: outside-tap close helper (works for mobile) ---
+    function closeAllCards(){
+      document.querySelectorAll('.metric[aria-expanded="true"]').forEach(el=>{
+        el.setAttribute('aria-expanded','false');
+      });
+    }
+    document.addEventListener('click', (e)=>{
+      if (!e.target.closest || !e.target.closest('.metric')) closeAllCards();
+    }, true);
+    document.addEventListener('touchstart', (e)=>{
+      if (!e.target.closest || !e.target.closest('.metric')) closeAllCards();
+    }, true);
+
     const KEY_TO_LABEL = {
-      overall:'Overall',
-      growth:'Growth',
-      benchmark:'Benchmark',
-      sentiment:'Sentiment',
-      competitive:'CompetitiveIntensity',
-      capital:'CapitalIntensity'
+      overall:'Overall', growth:'Growth', benchmark:'Benchmark', sentiment:'Sentiment',
+      competitive:'CompetitiveIntensity', capital:'CapitalIntensity'
     };
     function toCardsArray(x){
       if (Array.isArray(x)) return x;
@@ -296,8 +272,7 @@
       if(!scores) return;
 
       const cardsMap = indexCards(cardsRaw);
-      const keys = ORDER.filter(k => k in scores)
-                        .concat(Object.keys(scores).filter(k => !ORDER.includes(k)));
+      const keys = ORDER.filter(k => k in scores).concat(Object.keys(scores).filter(k => !ORDER.includes(k)));
 
       keys.forEach(label=>{
         const val = Number(scores[label]);
@@ -341,30 +316,28 @@
         tile.setAttribute('tabindex','0');
         tile.setAttribute('aria-expanded','false');
 
-        function closeAll() {
-          document.querySelectorAll('.metric[aria-expanded="true"]')
-            .forEach(el => el.setAttribute('aria-expanded','false'));
-        }
-
-        tile.addEventListener('click', () => {
+        // --- NEW: reliable tap-to-toggle (prevents flicker) ---
+        function toggleTile(e){
+          e.stopPropagation();
           const open = tile.getAttribute('aria-expanded') === 'true';
-          closeAll();
+          closeAllCards();
           tile.setAttribute('aria-expanded', String(!open));
-        });
+        }
+        tile.addEventListener('click', toggleTile);
+        tile.addEventListener('touchstart', toggleTile);
 
         tile.addEventListener('keydown', (e) => {
-          if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); tile.click(); }
+          if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggleTile(e); }
           if (e.key === 'Escape') { tile.setAttribute('aria-expanded','false'); }
         });
 
-        tile.addEventListener('blur', () => tile.setAttribute('aria-expanded','false'));
+        // (removed blur-close to avoid mobile flicker)
 
         requestAnimationFrame(()=>{ fill.style.width = Math.max(0, Math.min(100, val)) + '%'; });
         animateValue(valueEl, val, 1000);
       });
     }
 
-    // ---- main flow ----
     document.getElementById('send').onclick = async () => {
       const idea = document.getElementById('idea').value.trim();
       if(!idea) return alert('Please type an idea first.');
@@ -378,14 +351,10 @@
       answer.textContent = '';
       resetProgress();
       status.innerHTML = `<span class="spinner" aria-hidden="true"></span><span>Submitting...</span>`;
-      btn.disabled = true; btn.textContent = 'Evaluating…';
+      btn.disabled = true; btn.textContent = 'Evaluating…`;
 
       try{
-        const r1 = await fetch(SUBMIT_URL,{
-          method:'POST',
-          headers:{'Content-Type':'application/json'},
-          body:JSON.stringify({ idea })
-        });
+        const r1 = await fetch(SUBMIT_URL,{ method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ idea }) });
         const { jobId } = await r1.json();
         if(!jobId) throw new Error('No job id returned');
 
@@ -406,7 +375,7 @@
               done = true;
               status.innerHTML = `<span>Completed</span>`;
               setProgress(100);
-              renderScores(data.scores, data.cards); // ← cards wired in
+              renderScores(data.scores, data.cards);
               const brief = extractBrief(data.brief || '');
               answer.innerHTML = formatBriefToHTML(brief);
               break;

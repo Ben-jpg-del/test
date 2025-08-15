@@ -92,6 +92,9 @@
     }
     @media (hover:none){
       .metric:hover .hovercard{opacity:0; visibility:hidden; transform:translate(-50%,6px)}
+      .metric[aria-expanded="true"] .hovercard{
+        opacity:1; visibility:visible; transform:translate(-50%,0); pointer-events:auto;
+      }
     }
     .hovercard h4{font-size:12px;font-weight:700;margin:0 0 6px;color:#cfd6e6;display:flex;align-items:center;gap:8px}
     .hovercard .badge{font-size:10px;padding:2px 6px;border-radius:999px;border:1px solid var(--border);background:#10182b;color:#cdd6e3}
@@ -328,6 +331,13 @@
         tile.addEventListener('keydown', (e) => {
           if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggleTile(e); }
           if (e.key === 'Escape') { tile.setAttribute('aria-expanded','false'); }
+        });
+
+        // Add click outside handler for mobile
+        document.addEventListener('click', (e) => {
+          if (!tile.contains(e.target)) {
+            tile.setAttribute('aria-expanded', 'false');
+          }
         });
 
         requestAnimationFrame(()=>{ fill.style.width = Math.max(0, Math.min(100, val)) + '%'; });

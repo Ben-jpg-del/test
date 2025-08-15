@@ -215,7 +215,7 @@
       requestAnimationFrame(step);
     }
 
-    // --- NEW: outside-tap close helper (works for mobile) ---
+    // outside-tap close helper
     function closeAllCards(){
       document.querySelectorAll('.metric[aria-expanded="true"]').forEach(el=>{
         el.setAttribute('aria-expanded','false');
@@ -316,7 +316,6 @@
         tile.setAttribute('tabindex','0');
         tile.setAttribute('aria-expanded','false');
 
-        // --- NEW: reliable tap-to-toggle (prevents flicker) ---
         function toggleTile(e){
           e.stopPropagation();
           const open = tile.getAttribute('aria-expanded') === 'true';
@@ -331,13 +330,12 @@
           if (e.key === 'Escape') { tile.setAttribute('aria-expanded','false'); }
         });
 
-        // (removed blur-close to avoid mobile flicker)
-
         requestAnimationFrame(()=>{ fill.style.width = Math.max(0, Math.min(100, val)) + '%'; });
         animateValue(valueEl, val, 1000);
       });
     }
 
+    // ---- main flow ----
     document.getElementById('send').onclick = async () => {
       const idea = document.getElementById('idea').value.trim();
       if(!idea) return alert('Please type an idea first.');
@@ -351,10 +349,14 @@
       answer.textContent = '';
       resetProgress();
       status.innerHTML = `<span class="spinner" aria-hidden="true"></span><span>Submitting...</span>`;
-      btn.disabled = true; btn.textContent = 'Evaluating…`;
+      btn.disabled = true; btn.textContent = 'Evaluating…';
 
       try{
-        const r1 = await fetch(SUBMIT_URL,{ method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ idea }) });
+        const r1 = await fetch(SUBMIT_URL,{
+          method:'POST',
+          headers:{'Content-Type':'application/json'},
+          body:JSON.stringify({ idea })
+        });
         const { jobId } = await r1.json();
         if(!jobId) throw new Error('No job id returned');
 

@@ -52,6 +52,7 @@
     .progress{height:8px;border-radius:6px;background:#0b1020;border:1px solid var(--border);margin-top:10px;overflow:hidden}
     .progress-inner{height:100%;width:0%;background:linear-gradient(90deg,var(--accent),var(--accent-2));transition:width .6s ease}
 
+    /* metrics grid */
     .metrics{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:18px}
     @media (max-width:720px){.metrics{grid-template-columns:1fr}}
 
@@ -69,6 +70,7 @@
     .meter.mid > i {background:linear-gradient(90deg,#f59e0b,#ffd166)}
     .meter.bad > i {background:linear-gradient(90deg,#ef4444,#fb7185)}
 
+    /* brief panel */
     #answer{margin-top:18px;border:1px solid var(--border);border-radius:12px;background:#0b1020;padding:18px}
     #answer .md-h2{font-size:14px;font-weight:700;margin:12px 0 6px;color:#cfd6e6}
     #answer p{margin:6px 0;font-size:13px;color:#d8dee9}
@@ -76,6 +78,7 @@
     #answer::-webkit-scrollbar-thumb{background:#16203a;border-radius:8px}
     .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
 
+    /* hover card (desktop hover; mobile uses click) */
     .hovercard{
       position:absolute; left:50%; bottom:calc(100% + 10px); transform:translate(-50%,6px);
       max-width:min(360px, calc(100% - 16px)); width:max-content;
@@ -84,21 +87,24 @@
       transition:opacity .15s ease, transform .15s ease; pointer-events:none; z-index:20;
     }
     .metric:hover .hovercard{opacity:1; visibility:visible; transform:translate(-50%,0)}
+    .metric[aria-expanded="true"] .hovercard{
+      opacity:1; visibility:visible; transform:translate(-50%,0); pointer-events:auto;
+    }
+    @media (hover:none){
+      .metric:hover .hovercard{opacity:0; visibility:hidden; transform:translate(-50%,6px)}
+    }
     .hovercard h4{font-size:12px;font-weight:700;margin:0 0 6px;color:#cfd6e6;display:flex;align-items:center;gap:8px}
     .hovercard .badge{font-size:10px;padding:2px 6px;border-radius:999px;border:1px solid var(--border);background:#10182b;color:#cdd6e3}
     .hovercard p{font-size:12px;color:#d8dee9;line-height:1.4;margin:4px 0 6px}
     .hovercard ul{margin-left:16px}
     .hovercard li{font-size:12px;color:#cbd5e1;margin:2px 0}
 
+    /* investor-grade brief headings */
     #answer .md-h1{font-size:16px;font-weight:700;letter-spacing:.02em;margin:14px 0 6px;color:#e2e8f0}
     #answer .md-h3{font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:#9aa4b2;margin:10px 0 4px}
     #answer .lead{font-size:13px;color:#d8dee9;margin:2px 0 8px}
 
-    .metric[aria-expanded="true"] .hovercard{opacity:1;visibility:visible;transform:translate(-50%,0)}
-    @media (hover:none){
-      .metric:hover .hovercard{opacity:0;visibility:hidden;transform:translate(-50%,6px)}
-    }
-
+    /* phone status sizing */
     @media (max-width:480px){
       button{flex:0 0 128px;padding:10px 12px;font-size:13px}
       #status{padding:10px 12px;font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -215,22 +221,13 @@
       requestAnimationFrame(step);
     }
 
-    // outside-tap close helper
-    function closeAllCards(){
-      document.querySelectorAll('.metric[aria-expanded="true"]').forEach(el=>{
-        el.setAttribute('aria-expanded','false');
-      });
-    }
-    document.addEventListener('click', (e)=>{
-      if (!e.target.closest || !e.target.closest('.metric')) closeAllCards();
-    }, true);
-    document.addEventListener('touchstart', (e)=>{
-      if (!e.target.closest || !e.target.closest('.metric')) closeAllCards();
-    }, true);
-
     const KEY_TO_LABEL = {
-      overall:'Overall', growth:'Growth', benchmark:'Benchmark', sentiment:'Sentiment',
-      competitive:'CompetitiveIntensity', capital:'CapitalIntensity'
+      overall:'Overall',
+      growth:'Growth',
+      benchmark:'Benchmark',
+      sentiment:'Sentiment',
+      competitive:'CompetitiveIntensity',
+      capital:'CapitalIntensity'
     };
     function toCardsArray(x){
       if (Array.isArray(x)) return x;
@@ -272,7 +269,8 @@
       if(!scores) return;
 
       const cardsMap = indexCards(cardsRaw);
-      const keys = ORDER.filter(k => k in scores).concat(Object.keys(scores).filter(k => !ORDER.includes(k)));
+      const keys = ORDER.filter(k => k in scores)
+                        .concat(Object.keys(scores).filter(k => !ORDER.includes(k)));
 
       keys.forEach(label=>{
         const val = Number(scores[label]);
@@ -312,6 +310,7 @@
         tile.appendChild(meter);
         wrap.appendChild(tile);
 
+        // Toggle on click only (mobile-friendly). No outside/blur logic.
         tile.setAttribute('role','button');
         tile.setAttribute('tabindex','0');
         tile.setAttribute('aria-expanded','false');
@@ -319,12 +318,13 @@
         function toggleTile(e){
           e.stopPropagation();
           const open = tile.getAttribute('aria-expanded') === 'true';
-          closeAllCards();
+          // close others, then toggle this one
+          document.querySelectorAll('.metric[aria-expanded="true"]').forEach(el=>{
+            if (el !== tile) el.setAttribute('aria-expanded','false');
+          });
           tile.setAttribute('aria-expanded', String(!open));
         }
         tile.addEventListener('click', toggleTile);
-        tile.addEventListener('touchstart', toggleTile);
-
         tile.addEventListener('keydown', (e) => {
           if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggleTile(e); }
           if (e.key === 'Escape') { tile.setAttribute('aria-expanded','false'); }

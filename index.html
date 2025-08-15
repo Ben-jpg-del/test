@@ -34,7 +34,7 @@
       color:var(--text);padding:14px;font-size:14px;line-height:1.5;transition:border-color .2s, box-shadow .2s;
     }
     textarea:focus{outline:none;border-color:#2b3c5a;box-shadow:0 0 0 3px rgba(62,132,198,.15)}
-    .row{display:flex;gap:12px;margin-top:12px}
+    .row{display:flex;gap:12px;margin-top:12px;min-width:0;} /* allow children to shrink inside container */
     button{
       appearance:none;border:0;border-radius:10px;cursor:pointer;padding:12px 16px;font-size:14px;font-weight:600;
       background:linear-gradient(135deg,var(--accent),var(--accent-2)); color:#0b0f1a;flex:0 0 160px; box-shadow:0 6px 18px rgba(62,132,198,.25);
@@ -42,7 +42,11 @@
     }
     button:hover{transform:translateY(-1px)}
     button:disabled{filter:grayscale(.4) brightness(.9);cursor:not-allowed}
-    #status{flex:1;border:1px dashed var(--border);border-radius:10px;padding:12px 14px;font-size:13px;color:var(--muted);display:flex;align-items:center;gap:10px;min-height:44px}
+    #status{
+      flex:1;border:1px dashed var(--border);border-radius:10px;padding:12px 14px;font-size:13px;color:var(--muted);
+      display:flex;align-items:center;gap:10px;min-height:44px;
+      min-width:0; /* key: let flex item shrink on small screens */
+    }
     .spinner{width:16px;height:16px;border:2px solid rgba(255,255,255,.15);border-top-color:var(--accent);border-radius:50%;animation:spin 1s linear infinite}
     @keyframes spin{to{transform:rotate(360deg)}}
     .progress{height:8px;border-radius:6px;background:#0b1020;border:1px solid var(--border);margin-top:10px;overflow:hidden}
@@ -110,6 +114,19 @@
       .metric:hover .hovercard{
         opacity:0; visibility:hidden; transform:translate(-50%,6px);
       }
+    }
+
+    /* ===== Phone-specific fix so status frame stays inside ===== */
+    @media (max-width:480px){
+      button{flex:0 0 128px;padding:10px 12px;font-size:13px}
+      #status{
+        padding:10px 12px;font-size:12px;
+        white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+      }
+    }
+    @media (max-width:360px){
+      button{flex:0 0 110px;padding:8px 10px;font-size:12px}
+      #status{padding:8px 10px;font-size:11px}
     }
   </style>
 </head>
@@ -191,20 +208,16 @@
         const line = raw.trim();
         if (!line){ out.push(''); continue; }
 
-        // Backward-compat: accept old "## " markers if they show up
         if (line.startsWith('## ')){
           out.push(`<div class="md-h1">${escapeHTML(line.slice(3))}</div>`);
           continue;
         }
 
-        // Section headers with NO symbols
         if (SECTIONS.has(line)){
           out.push(`<div class="md-h1">${escapeHTML(line)}</div>`);
           continue;
         }
 
-        // Subheaders like:
-        // "- **Title** — details"  OR  "- Title — details"  OR  "Title — details"
         const m = line.match(/^[-•]?\s*(?:\*\*)?(.+?)(?:\*\*)?\s+—\s+(.*)$/);
         if (m && m[1] && m[2] && m[1].length < 140){
           out.push(`<div class="md-h3">${escapeHTML(m[1])}</div>`);
@@ -212,7 +225,6 @@
           continue;
         }
 
-        // Default paragraph
         out.push(`<p>${escapeHTML(line)}</p>`);
       }
       return out.join('');
@@ -316,7 +328,6 @@
         const fill = document.createElement('i');
         meter.appendChild(fill);
 
-        // add hover card if present
         const card = cardsMap[label];
         if (card) tile.appendChild(makeHoverCard(card,label));
 
@@ -326,7 +337,6 @@
         tile.appendChild(meter);
         wrap.appendChild(tile);
 
-        // ===== NEW: tap/keyboard support for hovercards =====
         tile.setAttribute('role','button');
         tile.setAttribute('tabindex','0');
         tile.setAttribute('aria-expanded','false');
